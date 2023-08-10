@@ -47,6 +47,7 @@ fun ImageSegmenter(
         }) { contentPadding ->
         Column(modifier = modifier.padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally) {
+
             Image(bitmap = viewModel.getImageBitmap(context), contentDescription = "Sample image")
 
             Row {

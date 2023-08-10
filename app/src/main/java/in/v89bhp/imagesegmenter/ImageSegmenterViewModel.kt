@@ -16,11 +16,11 @@ class ImageSegmenterViewModel : ViewModel() {
 
     private var imageBitmap: ImageBitmap? by mutableStateOf(null)
 
-    var imageConfiguration by mutableStateOf("")
+    var imageConfiguration  = ""
 
-    var imageSize by mutableStateOf("")
+    var imageSize = ""
 
-    var colorSpace by mutableStateOf("")
+    var colorSpace = ""
 
     fun getImageBitmap(context: Context): ImageBitmap {
         if (imageBitmap == null) {
