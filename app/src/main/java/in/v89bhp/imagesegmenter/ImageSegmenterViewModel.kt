@@ -10,14 +10,17 @@ import androidx.lifecycle.ViewModel
 
 class ImageSegmenterViewModel : ViewModel() {
 
+    private  var imageBitmap: ImageBitmap? = null
 
     fun getImageBitmap(context: Context): ImageBitmap {
-        val assetManager: AssetManager = context.assets
+        if (imageBitmap == null) {
+            val assetManager: AssetManager = context.assets
 
-        val imageBitmap = assetManager.open("sample_images/pp.jpg").use {
-            BitmapFactory.decodeStream(it).asImageBitmap()
+            imageBitmap = assetManager.open("sample_images/pp.jpg").use {
+                BitmapFactory.decodeStream(it).asImageBitmap()
+            }
         }
-        return imageBitmap
+        return imageBitmap!!
     }
 
     fun removeBackground() {
