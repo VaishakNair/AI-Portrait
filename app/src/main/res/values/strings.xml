@@ -38,6 +38,11 @@
 
     <string name="camera_permission_request">Object Detector requires Camera permission to provide input data to ML model. Please grant the permission</string>
     <string name="grant_permission">&grant_permission;</string>
+
+
     <string name="remove_background">Remove background</string>
+    <string name="configuration">Configuration:</string>
+    <string name="image_size">Size (w x h):</string>
+    <string name="color_space">Color space:</string>
 
 </resources>

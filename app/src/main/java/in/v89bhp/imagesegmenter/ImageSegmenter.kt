@@ -2,6 +2,7 @@ package `in`.v89bhp.imagesegmenter
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,6 +48,18 @@ fun ImageSegmenter(
         Column(modifier = modifier.padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally) {
             Image(bitmap = viewModel.getImageBitmap(context), contentDescription = "Sample image")
+
+            Row {
+                Text(text = stringResource(R.string.image_size))
+                Text(text = viewModel.imageSize)}
+
+            Row {
+                Text(text = stringResource(R.string.configuration))
+                Text(text = viewModel.imageConfiguration)}
+
+            Row {
+                Text(text = stringResource(R.string.color_space))
+                Text(text = viewModel.colorSpace)}
 
             Button(onClick = { viewModel.removeBackground() }) {
                 Text(text = stringResource(id = R.string.remove_background))
