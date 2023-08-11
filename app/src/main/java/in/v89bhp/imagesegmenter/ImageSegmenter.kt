@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,6 +24,11 @@ fun ImageSegmenter(
     viewModel: ImageSegmenterViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val context = LocalContext.current
+
+    LaunchedEffect(key1 = true) {
+        viewModel.initializeImageSegmentationHelper(context)
+    }
+
     Scaffold(
         topBar = {
 
