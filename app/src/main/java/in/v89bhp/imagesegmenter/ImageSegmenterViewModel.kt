@@ -123,7 +123,9 @@ class ImageSegmenterViewModel(
     }
 
     suspend fun applyMask(scaledImageMask: Bitmap) = withContext(Dispatchers.IO) {
-            val outputBitmap = imageBitmap!!.asAndroidBitmap() // TODO
+            val outputBitmap = imageBitmap!!.asAndroidBitmap().let {// Make a mutable copy of the input bitmap.
+                it.copy(it.config, true)
+            }
 
             for (i in 0 until scaledImageMask.width) {
                 for (j in 0 until scaledImageMask.height) {
