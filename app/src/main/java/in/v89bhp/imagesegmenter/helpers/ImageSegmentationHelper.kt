@@ -18,10 +18,8 @@ package `in`.v89bhp.imagesegmenter.helpers
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Build
 import android.os.SystemClock
 import android.util.Log
-import androidx.annotation.RequiresApi
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
@@ -30,7 +28,6 @@ import org.tensorflow.lite.task.core.BaseOptions
 import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter
 import org.tensorflow.lite.task.vision.segmenter.OutputType
 import org.tensorflow.lite.task.vision.segmenter.Segmentation
-import java.util.*
 
 /**
  * Class responsible to run the Image Segmentation model. more information about the DeepLab model
@@ -46,7 +43,7 @@ class ImageSegmentationHelper(
     var numThreads: Int = 2,
     var currentDelegate: Int = 0,
     val context: Context,
-    val imageSegmentationListener: SegmentationListener?
+    val onError: (errorMessage: String) -> Unit
 ) {
     private var imageSegmenter: ImageSegmenter? = null
 
@@ -66,6 +63,8 @@ class ImageSegmentationHelper(
         // Set general segmentation options, including number of used threads
         val baseOptionsBuilder = BaseOptions.builder().setNumThreads(numThreads)
 
+        // TODO Tweak logic to always use GPU or NNAPI delegate if they're available (instead of
+        //  letting user decide):
         // Use the specified hardware for running the model. Default to CPU
         when (currentDelegate) {
             DELEGATE_CPU -> {
@@ -75,7 +74,7 @@ class ImageSegmentationHelper(
                 if (CompatibilityList().isDelegateSupportedOnThisDevice) {
                     baseOptionsBuilder.useGpu()
                 } else {
-                    imageSegmentationListener?.onError("GPU is not supported on this device")
+                    onError("GPU is not supported on this device")
                 }
             }
             DELEGATE_NNAPI -> {
@@ -100,7 +99,7 @@ class ImageSegmentationHelper(
                     optionsBuilder.build()
                 )
         } catch (e: IllegalStateException) {
-            imageSegmentationListener?.onError(
+            onError(
                 "Image segmentation failed to initialize. See error logs for details"
             )
             Log.e(TAG, "TFLite failed to load model with error: " + e.message)
@@ -108,7 +107,7 @@ class ImageSegmentationHelper(
     }
 
 
-    fun segment(image: Bitmap, imageRotation: Int) {
+    fun segment(image: Bitmap, imageRotation: Int): SegmentationResult {
 
         if (imageSegmenter == null) {
             setupImageSegmenter()
@@ -132,23 +131,33 @@ class ImageSegmentationHelper(
         val segmentResult = imageSegmenter?.segment(tensorImage)
         inferenceTime = SystemClock.uptimeMillis() - inferenceTime
 
-        imageSegmentationListener?.onResults(
-            segmentResult,
-            inferenceTime,
-            tensorImage.height,
-            tensorImage.width
-        )
+        return SegmentationResult(segmentResult,
+        inferenceTime,
+        tensorImage.height,
+        tensorImage.width)
+
+//        imageSegmentationListener?.onResults(
+//            segmentResult,
+//            inferenceTime,
+//            tensorImage.height,
+//            tensorImage.width
+//        )
     }
 
-    interface SegmentationListener {
-        fun onError(error: String)
-        fun onResults(
-            results: List<Segmentation>?,
-            inferenceTime: Long,
-            imageHeight: Int,
-            imageWidth: Int
-        )
-    }
+    data class SegmentationResult(val results: List<Segmentation>?,
+    val inferenceTime: Long,
+    val imageHeight: Int,
+    val imageWidth: Int)
+
+//    interface SegmentationListener {
+//        fun onError(error: String)
+//        fun onResults(
+//            results: List<Segmentation>?,
+//            inferenceTime: Long,
+//            imageHeight: Int,
+//            imageWidth: Int
+//        )
+//    }
 
     companion object {
         const val DELEGATE_CPU = 0

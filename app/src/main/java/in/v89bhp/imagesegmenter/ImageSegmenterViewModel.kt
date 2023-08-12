@@ -11,21 +11,26 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper
-import org.tensorflow.lite.support.common.ops.DequantizeOp
-import org.tensorflow.lite.support.common.ops.NormalizeOp
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.image.ops.Rot90Op
-import org.tensorflow.lite.task.vision.segmenter.Segmentation
 
 
-class ImageSegmenterViewModel : ViewModel() {
+class ImageSegmenterViewModel(
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Main,
+    private val start: CoroutineStart = CoroutineStart.DEFAULT
+) : ViewModel() {
 
     private var imageBitmap: ImageBitmap? by mutableStateOf(null)
 
-    var imageConfiguration  = ""
+    var imageConfiguration = ""
 
     var imageSize = ""
 
@@ -49,35 +54,37 @@ class ImageSegmenterViewModel : ViewModel() {
         return imageBitmap!!
     }
 
-    private val imageSegmentationListener = object : ImageSegmentationHelper.SegmentationListener {
-        override fun onError(error: String) {
-            TODO("Not yet implemented")
-        }
-
-        override fun onResults(
-            results: List<Segmentation>?,
-            inferenceTime: Long,
-            imageHeight: Int,
-            imageWidth: Int
-        ) {
-           // TODO
-            Log.i(TAG, "Segmented region count: ${results?.size ?: 0}")
-        }
-
+    private val onError: (errorMessage: String) -> Unit = {
+        errorMessage ->
+        TODO("Not yet implemented")
     }
+
 
     fun removeBackground() {
         // TODO Run in a IO dispatcher as a coroutine:
-        imageSegmentationHelper.segment(imageBitmap!!.asAndroidBitmap(), 0)
+        viewModelScope.launch(
+            context = coroutineDispatcher,
+            start = start
+        ) {
+            val segmentationResult = segmentImage()
+            Log.i(TAG, "Segmented region count: ${segmentationResult.results?.size ?: 0}")
+        }
+
     }
+
+    suspend fun segmentImage() =
+        withContext(Dispatchers.IO) {
+            imageSegmentationHelper.segment(imageBitmap!!.asAndroidBitmap(), 0)
+        }
+
+
 
     fun initializeImageSegmentationHelper(context: Context) {
         imageSegmentationHelper = ImageSegmentationHelper(
             context = context,
-            imageSegmentationListener = imageSegmentationListener
+            onError = onError
         )
     }
-
 
 
     fun rotateImage() {
@@ -88,7 +95,8 @@ class ImageSegmenterViewModel : ViewModel() {
 
                 .build()
 
-        imageBitmap = imageProcessor.process(TensorImage.fromBitmap(imageBitmap!!.asAndroidBitmap())).bitmap.asImageBitmap()
+        imageBitmap =
+            imageProcessor.process(TensorImage.fromBitmap(imageBitmap!!.asAndroidBitmap())).bitmap.asImageBitmap()
     }
 
     companion object {
