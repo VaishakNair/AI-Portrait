@@ -17,7 +17,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
@@ -25,7 +24,10 @@ import org.tensorflow.lite.support.image.ops.ResizeOp
 
 class ImageSegmenterViewModel(
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Main,
-    private val start: CoroutineStart = CoroutineStart.DEFAULT
+    private val start: CoroutineStart = CoroutineStart.DEFAULT,
+    private val imageSegmentationHelper: ImageSegmentationHelper = ImageSegmentationHelper(
+        coroutineDispatcher = Dispatchers.IO
+    )
 ) : ViewModel() {
 
     private var imageBitmap: ImageBitmap? by mutableStateOf(null)
@@ -36,7 +38,6 @@ class ImageSegmenterViewModel(
 
     var colorSpace = ""
 
-    private lateinit var imageSegmentationHelper: ImageSegmentationHelper
 
     fun getImageBitmap(context: Context): ImageBitmap {
         if (imageBitmap == null) {
@@ -54,36 +55,26 @@ class ImageSegmenterViewModel(
         return imageBitmap!!
     }
 
-    private val onError: (errorMessage: String) -> Unit = {
-        errorMessage ->
+    private val onError: (errorMessage: String) -> Unit = { errorMessage ->
         TODO("Not yet implemented")
     }
 
 
     fun removeBackground() {
-        // TODO Run in a IO dispatcher as a coroutine:
+        // Run in a IO dispatcher as a coroutine:
         viewModelScope.launch(
             context = coroutineDispatcher,
             start = start
         ) {
-            val segmentationResult = segmentImage()
+            val segmentationResult =
+                imageSegmentationHelper.segment(imageBitmap!!.asAndroidBitmap(), 0)
             Log.i(TAG, "Segmented region count: ${segmentationResult.results?.size ?: 0}")
         }
 
     }
 
-    suspend fun segmentImage() =
-        withContext(Dispatchers.IO) {
-            imageSegmentationHelper.segment(imageBitmap!!.asAndroidBitmap(), 0)
-        }
-
-
-
     fun initializeImageSegmentationHelper(context: Context) {
-        imageSegmentationHelper = ImageSegmentationHelper(
-            context = context,
-            onError = onError
-        )
+        imageSegmentationHelper.setupImageSegmenter(context, onError)
     }
 
 
