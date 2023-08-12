@@ -71,6 +71,9 @@ fun ImageSegmenter(
             Button(onClick = { viewModel.removeBackground() }) {
                 Text(text = stringResource(id = R.string.remove_background))
             }
+            if (viewModel.outputImageBitmap != null) {
+                Image(bitmap = viewModel.outputImageBitmap!!, contentDescription = "Output image")
+            }
 
         }
     }
