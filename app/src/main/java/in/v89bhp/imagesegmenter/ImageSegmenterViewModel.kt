@@ -78,9 +78,9 @@ class ImageSegmenterViewModel(
             if (!segmentationResult.results.isNullOrEmpty()) {
                 val segmentation = segmentationResult.results[0]
 
-                val colorLabels = segmentation.coloredLabels.mapIndexed { index, coloredLabel ->
-                    Log.i(TAG, "Category: $index Label: ${coloredLabel.getlabel()}")
-                }
+//                val colorLabels = segmentation.coloredLabels.mapIndexed { index, coloredLabel ->
+//                    Log.i(TAG, "Category: $index Label: ${coloredLabel.getlabel()}")
+//                }
 
 
                 val categoryMaskTensor = segmentation.masks[0] // A single category mask with each pixel value corresponding
@@ -102,15 +102,15 @@ class ImageSegmenterViewModel(
                     Bitmap.Config.ARGB_8888
                 )
 
-                outputImageBitmap = image.asImageBitmap()
+//                outputImageBitmap = image.asImageBitmap()
 
-//                // PreviewView is in FILL_START mode. So we need to scale up the bounding
-//                // box to match with the size that the captured images will be displayed.
-//                val scaleFactor = max(width * 1f / imageWidth, height * 1f / imageHeight)
-//                val scaleWidth = (imageWidth * scaleFactor).toInt()
-//                val scaleHeight = (imageHeight * scaleFactor).toInt()
-//
-//                scaleBitmap = Bitmap.createScaledBitmap(image, scaleWidth, scaleHeight, false)
+                // PreviewView is in FILL_START mode. So we need to scale up the bounding
+                // box to match with the size that the captured images will be displayed.
+//                val scaleFactor = max(width * 1f / segmentationResult.imageWidth, height * 1f / segmentationResult.imageHeight)
+                val scaleWidth = (segmentationResult.imageWidth * 1f).toInt()
+                val scaleHeight = (segmentationResult.imageHeight * 1f).toInt()
+
+                outputImageBitmap = Bitmap.createScaledBitmap(image, scaleWidth, scaleHeight, true).asImageBitmap()
 
             }
         }

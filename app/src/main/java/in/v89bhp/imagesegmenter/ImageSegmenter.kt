@@ -1,9 +1,12 @@
 package `in`.v89bhp.imagesegmenter
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -51,7 +54,9 @@ fun ImageSegmenter(
                 })
 
         }) { contentPadding ->
-        Column(modifier = modifier.padding(contentPadding),
+        Column(modifier = modifier
+            .padding(contentPadding)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally) {
 
             Image(bitmap = viewModel.getImageBitmap(context), contentDescription = "Sample image")
