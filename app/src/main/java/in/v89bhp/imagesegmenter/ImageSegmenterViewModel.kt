@@ -12,6 +12,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.graphics.get
+import androidx.core.graphics.set
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper
@@ -19,6 +21,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
@@ -95,14 +98,13 @@ class ImageSegmenterViewModel(
                     pixels[i] = if (categoryMaskArray[i].toInt() != 15) Color.TRANSPARENT else Color.RED
                 }
 
-                val image = Bitmap.createBitmap(
+                val imageMask = Bitmap.createBitmap(
                     pixels,
                     categoryMaskTensor.width,
                     categoryMaskTensor.height,
                     Bitmap.Config.ARGB_8888
                 )
 
-//                outputImageBitmap = image.asImageBitmap()
 
                 // PreviewView is in FILL_START mode. So we need to scale up the bounding
                 // box to match with the size that the captured images will be displayed.
@@ -110,12 +112,31 @@ class ImageSegmenterViewModel(
                 val scaleWidth = (segmentationResult.imageWidth * 1f).toInt()
                 val scaleHeight = (segmentationResult.imageHeight * 1f).toInt()
 
-                outputImageBitmap = Bitmap.createScaledBitmap(image, scaleWidth, scaleHeight, true).asImageBitmap()
+                val scaledImageMask = Bitmap.createScaledBitmap(imageMask, scaleWidth, scaleHeight, true)
+
+                outputImageBitmap = applyMask(scaledImageMask)
+
 
             }
         }
 
     }
+
+    suspend fun applyMask(scaledImageMask: Bitmap) = withContext(Dispatchers.IO) {
+            val outputBitmap = imageBitmap!!.asAndroidBitmap() // TODO
+
+            for (i in 0 until scaledImageMask.width) {
+                for (j in 0 until scaledImageMask.height) {
+                    val maskValue = scaledImageMask[i, j]
+                    if (maskValue == Color.TRANSPARENT) {
+                        outputBitmap[i, j] = maskValue
+                    }
+                }
+            }
+
+            outputBitmap.asImageBitmap()
+        }
+
 
     fun initializeImageSegmentationHelper(context: Context) {
         imageSegmentationHelper.setupImageSegmenter(context, onError)
