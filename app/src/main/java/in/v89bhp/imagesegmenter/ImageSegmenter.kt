@@ -1,9 +1,10 @@
 package `in`.v89bhp.imagesegmenter
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import `in`.v89bhp.imagesegmenter.ui.progressbars.CircularProgress
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -54,32 +56,55 @@ fun ImageSegmenter(
                 })
 
         }) { contentPadding ->
-        Column(modifier = modifier
-            .padding(contentPadding)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally) {
+        if (viewModel.isProcessing) {
+            CircularProgress(text = stringResource(id = R.string.processing))
+        } else {
+            Column(
+                modifier = modifier
+                    .padding(contentPadding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                if (viewModel.imageLoaded) {
+                    Image(
+                        bitmap = viewModel.getImageBitmap(context),
+                        contentDescription = "Sample image"
+                    )
 
-            Image(bitmap = viewModel.getImageBitmap(context), contentDescription = "Sample image")
+                    Row {
+                        Text(text = stringResource(R.string.image_size))
+                        Text(text = viewModel.imageSize)
+                    }
 
-            Row {
-                Text(text = stringResource(R.string.image_size))
-                Text(text = viewModel.imageSize)}
+                    Row {
+                        Text(text = stringResource(R.string.configuration))
+                        Text(text = viewModel.imageConfiguration)
+                    }
 
-            Row {
-                Text(text = stringResource(R.string.configuration))
-                Text(text = viewModel.imageConfiguration)}
+                    Row {
+                        Text(text = stringResource(R.string.color_space))
+                        Text(text = viewModel.colorSpace)
+                    }
 
-            Row {
-                Text(text = stringResource(R.string.color_space))
-                Text(text = viewModel.colorSpace)}
+                    Button(onClick = { viewModel.removeBackground() }) {
+                        Text(text = stringResource(id = R.string.remove_background))
+                    }
+                } else {
+                    Button(
+                        onClick = { viewModel.showImageSelector(context) }) {
+                        Text(text = stringResource(id = R.string.choose_image))
+                    }
+                }
+                if (viewModel.outputImageBitmap != null) {
+                    Image(
+                        bitmap = viewModel.outputImageBitmap!!,
+                        contentDescription = "Output image"
+                    )
+                }
 
-            Button(onClick = { viewModel.removeBackground() }) {
-                Text(text = stringResource(id = R.string.remove_background))
             }
-            if (viewModel.outputImageBitmap != null) {
-                Image(bitmap = viewModel.outputImageBitmap!!, contentDescription = "Output image")
-            }
-
         }
     }
 }

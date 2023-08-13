@@ -44,5 +44,7 @@
     <string name="configuration">Configuration:</string>
     <string name="image_size">Size (w x h):</string>
     <string name="color_space">Color space:</string>
+    <string name="processing">Processing…</string>
+    <string name="choose_image">Choose image</string>
 
 </resources>

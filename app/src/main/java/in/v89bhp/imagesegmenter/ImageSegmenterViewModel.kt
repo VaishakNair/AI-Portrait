@@ -1,11 +1,13 @@
 package `in`.v89bhp.imagesegmenter
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -25,7 +27,6 @@ import kotlinx.coroutines.withContext
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-import kotlin.math.max
 
 
 class ImageSegmenterViewModel(
@@ -37,6 +38,12 @@ class ImageSegmenterViewModel(
 ) : ViewModel() {
 
     private var imageBitmap: ImageBitmap? by mutableStateOf(null)
+
+    var isProcessing by mutableStateOf(false)
+
+    var imageLoaded by mutableStateOf(false)
+
+    var backgroundRemoved by mutableStateOf(false)
 
     var outputImageBitmap: ImageBitmap? by mutableStateOf(null)
 
@@ -68,23 +75,29 @@ class ImageSegmenterViewModel(
     }
 
 
+    fun showImageSelector(context: Context) {
+        ActivityResultContracts.PickVisualMedia
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, text.text)
+            type = "text/plain"
+        }
+        context.startActivity(Intent.createChooser(sendIntent, null))
+    }
+
     fun removeBackground() {
         // Run in a IO dispatcher as a coroutine:
         viewModelScope.launch(
             context = coroutineDispatcher,
             start = start
         ) {
+            isProcessing = true
             val segmentationResult =
                 imageSegmentationHelper.segment(imageBitmap!!.asAndroidBitmap(), 0)
             Log.i(TAG, "Segmented region count: ${segmentationResult.results?.size ?: 0}")
 
             if (!segmentationResult.results.isNullOrEmpty()) {
                 val segmentation = segmentationResult.results[0]
-
-//                val colorLabels = segmentation.coloredLabels.mapIndexed { index, coloredLabel ->
-//                    Log.i(TAG, "Category: $index Label: ${coloredLabel.getlabel()}")
-//                }
-
 
                 val categoryMaskTensor = segmentation.masks[0] // A single category mask with each pixel value corresponding
                 // to the category to which the pixel belongs
@@ -115,6 +128,8 @@ class ImageSegmenterViewModel(
                 val scaledImageMask = Bitmap.createScaledBitmap(imageMask, scaleWidth, scaleHeight, true)
 
                 outputImageBitmap = applyMask(scaledImageMask)
+
+                isProcessing = false
 
 
             }
