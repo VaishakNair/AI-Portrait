@@ -46,5 +46,6 @@
     <string name="color_space">Color space:</string>
     <string name="processing">Processing…</string>
     <string name="choose_image">Choose image</string>
+    <string name="loading_image">Loading image…</string>
 
 </resources>

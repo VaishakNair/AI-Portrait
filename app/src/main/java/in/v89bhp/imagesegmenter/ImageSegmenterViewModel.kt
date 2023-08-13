@@ -40,6 +40,8 @@ class ImageSegmenterViewModel(
 
     var imageBitmap: ImageBitmap? by mutableStateOf(null)
 
+    var loadingImage by mutableStateOf(false)
+
     var isProcessing by mutableStateOf(false)
 
     var imageLoaded by mutableStateOf(false)
@@ -77,6 +79,7 @@ class ImageSegmenterViewModel(
 
 
     fun loadImage(context: Context, imageUri: Uri) {
+        loadingImage = true
         val source: ImageDecoder.Source =
             ImageDecoder.createSource(context.contentResolver, imageUri)
         imageBitmap = ImageDecoder.decodeBitmap(source).let { bitmap -> // Convert to ARGB_8888 format:
@@ -86,6 +89,7 @@ class ImageSegmenterViewModel(
             imageSize = "${it.width} x ${it.height}"
             colorSpace = it.colorSpace.toString()
         }
+        loadingImage = false
         imageLoaded = true
     }
 
@@ -140,8 +144,6 @@ class ImageSegmenterViewModel(
                 outputImageBitmap = applyMask(scaledImageMask)
 
                 isProcessing = false
-
-
             }
         }
 

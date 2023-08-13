@@ -59,8 +59,8 @@ fun ImageSegmenter(
                 })
 
         }) { contentPadding ->
-        if (viewModel.isProcessing) {
-            CircularProgress(text = stringResource(id = R.string.processing))
+        if (viewModel.isProcessing || viewModel.loadingImage) {
+            CircularProgress(text = stringResource(id = if (viewModel.isProcessing) R.string.processing else R.string.loading_image))
         } else {
             Column(
                 modifier = modifier
