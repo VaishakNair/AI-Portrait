@@ -38,7 +38,7 @@ class ImageSegmenterViewModel(
     )
 ) : ViewModel() {
 
-    private var imageBitmap: ImageBitmap? by mutableStateOf(null)
+    var imageBitmap: ImageBitmap? by mutableStateOf(null)
 
     var isProcessing by mutableStateOf(false)
 
@@ -77,10 +77,16 @@ class ImageSegmenterViewModel(
 
 
     fun loadImage(context: Context, imageUri: Uri) {
-        val source: ImageDecoder.Source = ImageDecoder.createSource(context.contentResolver, imageUri)
-        imageBitmap = ImageDecoder.decodeBitmap(source).asImageBitmap()
+        val source: ImageDecoder.Source =
+            ImageDecoder.createSource(context.contentResolver, imageUri)
+        imageBitmap = ImageDecoder.decodeBitmap(source).let { bitmap -> // Convert to ARGB_8888 format:
+            bitmap.copy(Bitmap.Config.ARGB_8888, false)
+        }.asImageBitmap().also {
+            imageConfiguration = it.config.toString()
+            imageSize = "${it.width} x ${it.height}"
+            colorSpace = it.colorSpace.toString()
+        }
         imageLoaded = true
-
     }
 
     fun removeBackground() {
@@ -97,16 +103,21 @@ class ImageSegmenterViewModel(
             if (!segmentationResult.results.isNullOrEmpty()) {
                 val segmentation = segmentationResult.results[0]
 
-                val categoryMaskTensor = segmentation.masks[0] // A single category mask with each pixel value corresponding
+                val categoryMaskTensor =
+                    segmentation.masks[0] // A single category mask with each pixel value corresponding
                 // to the category to which the pixel belongs
-                Log.i(TAG, "Category mask tensor width x height: ${categoryMaskTensor.width} x ${categoryMaskTensor.height}")
+                Log.i(
+                    TAG,
+                    "Category mask tensor width x height: ${categoryMaskTensor.width} x ${categoryMaskTensor.height}"
+                )
                 val categoryMaskArray = categoryMaskTensor.buffer.array()
-                Log.i(TAG,"Category mask array size: ${categoryMaskArray.size}")
+                Log.i(TAG, "Category mask array size: ${categoryMaskArray.size}")
 
                 val pixels = IntArray(categoryMaskArray.size)
 
                 for (i in categoryMaskArray.indices) {
-                    pixels[i] = if (categoryMaskArray[i].toInt() != 15) Color.TRANSPARENT else Color.RED
+                    pixels[i] =
+                        if (categoryMaskArray[i].toInt() != 15) Color.TRANSPARENT else Color.RED
                 }
 
                 val imageMask = Bitmap.createBitmap(
@@ -123,7 +134,8 @@ class ImageSegmenterViewModel(
                 val scaleWidth = (segmentationResult.imageWidth * 1f).toInt()
                 val scaleHeight = (segmentationResult.imageHeight * 1f).toInt()
 
-                val scaledImageMask = Bitmap.createScaledBitmap(imageMask, scaleWidth, scaleHeight, true)
+                val scaledImageMask =
+                    Bitmap.createScaledBitmap(imageMask, scaleWidth, scaleHeight, true)
 
                 outputImageBitmap = applyMask(scaledImageMask)
 
@@ -136,21 +148,22 @@ class ImageSegmenterViewModel(
     }
 
     suspend fun applyMask(scaledImageMask: Bitmap) = withContext(Dispatchers.IO) {
-            val outputBitmap = imageBitmap!!.asAndroidBitmap().let {// Make a mutable copy of the input bitmap.
+        val outputBitmap =
+            imageBitmap!!.asAndroidBitmap().let {// Make a mutable copy of the input bitmap.
                 it.copy(it.config, true)
             }
 
-            for (i in 0 until scaledImageMask.width) {
-                for (j in 0 until scaledImageMask.height) {
-                    val maskValue = scaledImageMask[i, j]
-                    if (maskValue == Color.TRANSPARENT) {
-                        outputBitmap[i, j] = maskValue
-                    }
+        for (i in 0 until scaledImageMask.width) {
+            for (j in 0 until scaledImageMask.height) {
+                val maskValue = scaledImageMask[i, j]
+                if (maskValue == Color.TRANSPARENT) {
+                    outputBitmap[i, j] = maskValue
                 }
             }
-
-            outputBitmap.asImageBitmap()
         }
+
+        outputBitmap.asImageBitmap()
+    }
 
 
     fun initializeImageSegmentationHelper(context: Context) {

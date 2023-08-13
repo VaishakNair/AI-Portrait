@@ -72,7 +72,7 @@ fun ImageSegmenter(
             ) {
                 if (viewModel.imageLoaded) {
                     Image(
-                        bitmap = viewModel.getImageBitmap(context),
+                        bitmap = viewModel.imageBitmap!!,
                         contentDescription = "Sample image"
                     )
 
