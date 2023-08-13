@@ -79,6 +79,7 @@ class ImageSegmenterViewModel(
 
 
     fun loadImage(context: Context, imageUri: Uri) {
+        backgroundRemoved = false
         loadingImage = true
         val source: ImageDecoder.Source =
             ImageDecoder.createSource(context.contentResolver, imageUri)
@@ -141,9 +142,10 @@ class ImageSegmenterViewModel(
                 val scaledImageMask =
                     Bitmap.createScaledBitmap(imageMask, scaleWidth, scaleHeight, true)
 
-                outputImageBitmap = applyMask(scaledImageMask)
+                imageBitmap = applyMask(scaledImageMask)
 
                 isProcessing = false
+                backgroundRemoved = true
             }
         }
 

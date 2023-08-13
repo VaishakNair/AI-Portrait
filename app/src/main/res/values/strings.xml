@@ -47,5 +47,6 @@
     <string name="processing">Processing…</string>
     <string name="choose_image">Choose image</string>
     <string name="loading_image">Loading image…</string>
+    <string name="save">Save</string>
 
 </resources>

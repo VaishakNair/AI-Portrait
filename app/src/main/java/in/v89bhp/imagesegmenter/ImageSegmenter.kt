@@ -91,36 +91,51 @@ fun ImageSegmenter(
                         Text(text = viewModel.colorSpace)
                     }
 
-                    Button(onClick = { viewModel.removeBackground() }) {
-                        Text(text = stringResource(id = R.string.remove_background))
-                    }
-                } else {
+                    if (!viewModel.backgroundRemoved) {
+                        Button(onClick = { viewModel.removeBackground() }) {
+                            Text(text = stringResource(id = R.string.remove_background))
+                        }
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
 
-                    val launcher =
-                        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { imageUri ->
-                            imageUri?.let {
-                                viewModel.loadImage(context, it)
+                            ChooseImageButton(viewModel = viewModel)
+                            Button(onClick = { /*TODO*/ }) {
+                                Text(text = stringResource(id = R.string.save))
                             }
                         }
-                    Button(
-                        onClick = {
-                            launcher.launch(
-                                PickVisualMediaRequest.Builder()
-                                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                    .build()
-                            )
-                        }) {
-                        Text(text = stringResource(id = R.string.choose_image))
                     }
+                } else {
+                    ChooseImageButton(viewModel = viewModel)
                 }
-                if (viewModel.outputImageBitmap != null) {
-                    Image(
-                        bitmap = viewModel.outputImageBitmap!!,
-                        contentDescription = "Output image"
-                    )
-                }
-
             }
         }
+    }
+}
+
+@Composable
+fun ChooseImageButton(
+    viewModel: ImageSegmenterViewModel,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { imageUri ->
+            imageUri?.let {
+                viewModel.loadImage(context, it)
+            }
+        }
+    Button(
+        modifier = modifier,
+        onClick = {
+            launcher.launch(
+                PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    .build()
+            )
+        }) {
+        Text(text = stringResource(id = R.string.choose_image))
     }
 }
