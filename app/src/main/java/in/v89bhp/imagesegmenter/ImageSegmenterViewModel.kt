@@ -1,14 +1,14 @@
 package `in`.v89bhp.imagesegmenter
 
+import android.R.attr.bitmap
 import android.content.Context
-import android.content.Intent
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -76,7 +76,10 @@ class ImageSegmenterViewModel(
     }
 
 
-    fun loadImage(context: Context, uri: Uri) {
+    fun loadImage(context: Context, imageUri: Uri) {
+        val source: ImageDecoder.Source = ImageDecoder.createSource(context.contentResolver, imageUri)
+        imageBitmap = ImageDecoder.decodeBitmap(source).asImageBitmap()
+        imageLoaded = true
 
     }
 
