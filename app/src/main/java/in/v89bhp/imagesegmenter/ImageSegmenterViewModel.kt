@@ -6,6 +6,7 @@ import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
@@ -75,14 +76,8 @@ class ImageSegmenterViewModel(
     }
 
 
-    fun showImageSelector(context: Context) {
-        ActivityResultContracts.PickVisualMedia
-        val sendIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, text.text)
-            type = "text/plain"
-        }
-        context.startActivity(Intent.createChooser(sendIntent, null))
+    fun loadImage(context: Context, uri: Uri) {
+
     }
 
     fun removeBackground() {

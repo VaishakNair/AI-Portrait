@@ -1,5 +1,8 @@
 package `in`.v89bhp.imagesegmenter
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -92,8 +95,21 @@ fun ImageSegmenter(
                         Text(text = stringResource(id = R.string.remove_background))
                     }
                 } else {
+
+                    val launcher =
+                        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { imageUri ->
+                            imageUri?.let {
+                                viewModel.loadImage(context, it)
+                            }
+                        }
                     Button(
-                        onClick = { viewModel.showImageSelector(context) }) {
+                        onClick = {
+                            launcher.launch(
+                                PickVisualMediaRequest.Builder()
+                                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    .build()
+                            )
+                        }) {
                         Text(text = stringResource(id = R.string.choose_image))
                     }
                 }
