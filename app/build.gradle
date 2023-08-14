@@ -60,7 +60,7 @@ dependencies {
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
-    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.material3:material3:1.1.1'
 
     // Tensorflow Lite dependencies
 //    implementation 'org.tensorflow:tensorflow-lite-task-vision-play-services:0.4.2'
@@ -97,6 +97,8 @@ dependencies {
     // Compose-viewmodel
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1"
 
+    // TF Lite model metadata extractor:
+    implementation "org.tensorflow:tensorflow-lite-metadata:0.4.4"
 
 
 
