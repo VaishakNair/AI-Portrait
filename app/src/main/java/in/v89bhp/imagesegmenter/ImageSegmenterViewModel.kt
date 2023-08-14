@@ -80,7 +80,7 @@ class ImageSegmenterViewModel(
                     appendLine(
                         "Input tensor #$i quantization parameters: Scale: ${
                             getInputTensorQuantizationParams(
-                                0
+                                i
                             ).scale
                         } Zero point: ${getInputTensorQuantizationParams(i).zeroPoint}"
                     )
@@ -103,11 +103,14 @@ class ImageSegmenterViewModel(
                             getOutputTensorQuantizationParams(
                                 i
                             ).scale
-                        } Zero point: ${getOutputTensorQuantizationParams(0).zeroPoint}"
+                        } Zero point: ${getOutputTensorQuantizationParams(i).zeroPoint}"
                     )
                     appendLine("Output tensor #$i dimension names length: ${getOutputTensorMetadata(i)?.dimensionNamesLength()}")
                     appendLine("Output tensor #$i dimension names vector: ${getOutputTensorMetadata(i)?.dimensionNamesVector()}")
                 }
+
+                appendLine("Model metadata description: ${modelMetadata.description()}")
+                appendLine("Model name: ${modelMetadata.name()} (Version: ${modelMetadata.version()})")
             }
 
         }
@@ -211,7 +214,7 @@ class ImageSegmenterViewModel(
 
     }
 
-    suspend fun applyMask(scaledImageMask: Bitmap) = withContext(Dispatchers.IO) {
+    private suspend fun applyMask(scaledImageMask: Bitmap) = withContext(Dispatchers.IO) {
         val outputBitmap =
             imageBitmap!!.asAndroidBitmap().let {// Make a mutable copy of the input bitmap.
                 it.copy(it.config, true)
