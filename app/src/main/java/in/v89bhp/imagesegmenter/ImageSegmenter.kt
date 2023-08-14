@@ -18,7 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -46,36 +46,32 @@ fun ImageSegmenter(
 
     LaunchedEffect(key1 = true) {
         viewModel.initializeImageSegmentationHelper(context)
+        viewModel.loadModelMetadata(context)
     }
 
     BottomSheetScaffold(
 
         scaffoldState = scaffoldState,
-        sheetPeekHeight = 128.dp,
+//        sheetPeekHeight = 128.dp,
         sheetContent = {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(128.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Swipe up to expand sheet")
-            }
+//            Box(
+//                Modifier
+//                    .fillMaxWidth()
+//                    .height(128.dp),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Text("Swipe up to expand sheet")
+//            }
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .padding(64.dp),
+                    .padding(64.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Sheet content")
-                Spacer(Modifier.height(20.dp))
-                Button(
-                    onClick = {
-                        scope.launch { scaffoldState.bottomSheetState.partialExpand() }
-                    }
-                ) {
-                    Text("Click to collapse sheet")
-                }
+                Text(text = stringResource(R.string.model_metadata),
+                style = MaterialTheme.typography.headlineLarge)
+                Text(viewModel.modelMetadata)
             }
         },
         topBar = {

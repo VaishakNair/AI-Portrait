@@ -126,6 +126,7 @@ class ImageSegmentationHelper(
             val imageProcessor =
                 ImageProcessor.Builder()
                     .add(Rot90Op(-imageRotation / 90))
+
                     .build()
 
             // Preprocess the image and convert it into a TensorImage for segmentation.

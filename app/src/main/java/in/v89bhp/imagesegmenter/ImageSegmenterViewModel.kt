@@ -1,6 +1,5 @@
 package `in`.v89bhp.imagesegmenter
 
-import android.R.attr.bitmap
 import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Bitmap
@@ -28,6 +27,8 @@ import kotlinx.coroutines.withContext
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
+import org.tensorflow.lite.support.metadata.MetadataExtractor
+import java.nio.ByteBuffer
 
 
 class ImageSegmenterViewModel(
@@ -48,8 +49,6 @@ class ImageSegmenterViewModel(
 
     var backgroundRemoved by mutableStateOf(false)
 
-    var outputImageBitmap: ImageBitmap? by mutableStateOf(null)
-
     var imageConfiguration = ""
 
     var imageSize = ""
@@ -57,9 +56,46 @@ class ImageSegmenterViewModel(
     var colorSpace = ""
 
 
+    var modelMetadata by mutableStateOf("")
+
+    fun loadModelMetadata(context: Context) {
+        val assetManager: AssetManager = context.assets
+        val metadataByteBuffer = ByteBuffer.wrap(assetManager.open("deeplabv3_1.tflite").use {
+            it.readBytes()
+        })
+
+        val metadataExtractor = MetadataExtractor(metadataByteBuffer)
+
+        val metadataStringBuilder = StringBuilder()
+
+        with(metadataExtractor) {
+            with(metadataStringBuilder) {
+                appendLine("Has metadata? ${hasMetadata()}")
+
+                appendLine("Input tensor count: $inputTensorCount")
+                appendLine("Input tensor description: ${getInputTensorMetadata(0)?.description()}")
+                appendLine("Input tensor shape: ${getInputTensorShape(0).joinToString(separator = " x ") { it.toString() }}")
+                appendLine("Input tensor quantization parameters: Scale: ${getInputTensorQuantizationParams(0).scale} Zero point: ${getInputTensorQuantizationParams(0).zeroPoint}")
+                appendLine("Input tensor dimension names length: ${getInputTensorMetadata(0)?.dimensionNamesLength()}")
+
+
+                appendLine("Output tensor count: $outputTensorCount")
+                appendLine("Output tensor description: ${getOutputTensorMetadata(0)?.description()}")
+                appendLine("Output tensor shape: ${getOutputTensorShape(0).joinToString(separator = " x ") { it.toString() }}")
+                appendLine("Output tensor quantization parameters: Scale: ${getOutputTensorQuantizationParams(0).scale} Zero point: ${getOutputTensorQuantizationParams(0).zeroPoint}")
+                appendLine("Output tensor dimension names length: ${getOutputTensorMetadata(0)?.dimensionNamesLength()}")
+                appendLine("Output tensor dimension names vector: ${getOutputTensorMetadata(0)?.dimensionNamesVector()}")
+            }
+
+        }
+
+        modelMetadata = metadataStringBuilder.toString()
+    }
+
     fun getImageBitmap(context: Context): ImageBitmap {
         if (imageBitmap == null) {
             val assetManager: AssetManager = context.assets
+
 
             imageBitmap = assetManager.open("sample_images/pp.jpg").use {
                 BitmapFactory.decodeStream(it).asImageBitmap()
@@ -83,13 +119,14 @@ class ImageSegmenterViewModel(
         loadingImage = true
         val source: ImageDecoder.Source =
             ImageDecoder.createSource(context.contentResolver, imageUri)
-        imageBitmap = ImageDecoder.decodeBitmap(source).let { bitmap -> // Convert to ARGB_8888 format:
-            bitmap.copy(Bitmap.Config.ARGB_8888, false)
-        }.asImageBitmap().also {
-            imageConfiguration = it.config.toString()
-            imageSize = "${it.width} x ${it.height}"
-            colorSpace = it.colorSpace.toString()
-        }
+        imageBitmap =
+            ImageDecoder.decodeBitmap(source).let { bitmap -> // Convert to ARGB_8888 format:
+                bitmap.copy(Bitmap.Config.ARGB_8888, false)
+            }.asImageBitmap().also {
+                imageConfiguration = it.config.toString()
+                imageSize = "${it.width} x ${it.height}"
+                colorSpace = it.colorSpace.toString()
+            }
         loadingImage = false
         imageLoaded = true
     }

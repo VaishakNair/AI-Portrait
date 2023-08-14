@@ -48,5 +48,6 @@
     <string name="choose_image">Choose image</string>
     <string name="loading_image">Loading image…</string>
     <string name="save">Save</string>
+    <string name="model_metadata">Model Metadata</string>
 
 </resources>
