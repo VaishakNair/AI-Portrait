@@ -73,18 +73,41 @@ class ImageSegmenterViewModel(
                 appendLine("Has metadata? ${hasMetadata()}")
 
                 appendLine("Input tensor count: $inputTensorCount")
-                appendLine("Input tensor description: ${getInputTensorMetadata(0)?.description()}")
-                appendLine("Input tensor shape: ${getInputTensorShape(0).joinToString(separator = " x ") { it.toString() }}")
-                appendLine("Input tensor quantization parameters: Scale: ${getInputTensorQuantizationParams(0).scale} Zero point: ${getInputTensorQuantizationParams(0).zeroPoint}")
-                appendLine("Input tensor dimension names length: ${getInputTensorMetadata(0)?.dimensionNamesLength()}")
+
+                for (i in 0 until inputTensorCount) {
+                    appendLine("Input tensor #$i description: ${getInputTensorMetadata(i)?.description()}")
+                    appendLine("Input tensor #$i shape: ${getInputTensorShape(i).joinToString(separator = " x ") { it.toString() }}")
+                    appendLine(
+                        "Input tensor #$i quantization parameters: Scale: ${
+                            getInputTensorQuantizationParams(
+                                0
+                            ).scale
+                        } Zero point: ${getInputTensorQuantizationParams(i).zeroPoint}"
+                    )
+                    appendLine("Input tensor #$i dimension names length: ${getInputTensorMetadata(i)?.dimensionNamesLength()}")
+                }
 
 
                 appendLine("Output tensor count: $outputTensorCount")
-                appendLine("Output tensor description: ${getOutputTensorMetadata(0)?.description()}")
-                appendLine("Output tensor shape: ${getOutputTensorShape(0).joinToString(separator = " x ") { it.toString() }}")
-                appendLine("Output tensor quantization parameters: Scale: ${getOutputTensorQuantizationParams(0).scale} Zero point: ${getOutputTensorQuantizationParams(0).zeroPoint}")
-                appendLine("Output tensor dimension names length: ${getOutputTensorMetadata(0)?.dimensionNamesLength()}")
-                appendLine("Output tensor dimension names vector: ${getOutputTensorMetadata(0)?.dimensionNamesVector()}")
+                for (i in 0 until outputTensorCount) {
+                    appendLine("Output tensor #$i description: ${getOutputTensorMetadata(i)?.description()}")
+                    appendLine(
+                        "Output tensor #$i shape: ${
+                            getOutputTensorShape(i).joinToString(
+                                separator = " x "
+                            ) { it.toString() }
+                        }"
+                    )
+                    appendLine(
+                        "Output tensor #$i quantization parameters: Scale: ${
+                            getOutputTensorQuantizationParams(
+                                i
+                            ).scale
+                        } Zero point: ${getOutputTensorQuantizationParams(0).zeroPoint}"
+                    )
+                    appendLine("Output tensor #$i dimension names length: ${getOutputTensorMetadata(i)?.dimensionNamesLength()}")
+                    appendLine("Output tensor #$i dimension names vector: ${getOutputTensorMetadata(i)?.dimensionNamesVector()}")
+                }
             }
 
         }
