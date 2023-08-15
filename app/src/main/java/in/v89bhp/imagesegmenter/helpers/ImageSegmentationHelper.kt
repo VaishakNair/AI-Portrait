@@ -98,7 +98,7 @@ class ImageSegmentationHelper(
             imageSegmenter =
                 ImageSegmenter.createFromFileAndOptions(
                     context,
-                    MODEL_DEEPLAB_XCEPTION65, // TODO Specify model here
+                    MODEL_MOBILE_NET_DM05, // TODO Specify model here
                     optionsBuilder.build()
                 )
         } catch (e: IllegalStateException) {
@@ -155,20 +155,7 @@ class ImageSegmentationHelper(
         const val DELEGATE_CPU = 0
         const val DELEGATE_GPU = 1
         const val DELEGATE_NNAPI = 2
-        const val MODEL_DEEPLABV3 = "deeplabv3_1.tflite"
-        const val MODEL_DEEPLABV3_MOBILE_NET_ADEK = "lite-model_deeplabv3-mobilenetv2-ade20k_1_default_2.tflite"
         const val MODEL_MOBILE_NET_DM05 = "lite-model_deeplabv3-mobilenetv2_dm05_1_default_2.tflite"
-        const val MODEL_MOBILE_NET_DM05_INT8 = "lite-model_deeplabv3-mobilenetv2_dm05-int8_1_default_2.tflite"
-        const val MODEL_MOBILE_NET_DM05_FLOAT_16 = "lite-model_deeplabv3-mobilenetv2_dm05-float16_1_default_2.tflite"
-        const val MODEL_XCEPTION65_CITYSCAPES = "lite-model_deeplabv3-xception65-cityscapes_1_default_2.tflite"
-        const val MODEL_DEEPLABV3_CITYSCAPES = "lite-model_deeplabv3-mobilenetv3-cityscapes_1_default_2.tflite"
-        const val OG = "lite-model_deeplabv3_1_metadata_2.tflite"
-        const val MODEL_MOBILE_NET_DM05_COCO = "lite-model_mobilenetv2-dm05-coco_dr_1.tflite"
-        const val MODEL_MOBILE_NET_DM05_COCO_FP16 = "lite-model_mobilenetv2-dm05-coco_fp16_1.tflite"
-        const val MODEL_MOBILE_NET_DM05_COCO_INT8 = "lite-model_mobilenetv2-dm05-coco_int8_1.tflite"
-        const val MODEL_MOBILE_NET_COCO_DR = "lite-model_mobilenetv2-coco_dr_1.tflite"
-        const val MODEL_MOBILE_NET_COCO_FP16 = "lite-model_mobilenetv2-coco_fp16_1.tflite"
-        const val MODEL_MOBILE_NET_COCO_INT8 = "lite-model_mobilenetv2-coco_int8_1.tflite"
         const val MODEL_DEEPLAB_XCEPTION65 = "lite-model_deeplabv3-xception65_1_default_2.tflite"
 
         private const val TAG = "Image Segmentation Helper"

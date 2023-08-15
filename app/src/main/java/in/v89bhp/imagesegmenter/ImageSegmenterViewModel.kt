@@ -60,7 +60,7 @@ class ImageSegmenterViewModel(
 
     fun loadModelMetadata(context: Context) {
         val assetManager: AssetManager = context.assets
-        val metadataByteBuffer = ByteBuffer.wrap(assetManager.open("deeplabv3_1.tflite").use {
+        val metadataByteBuffer = ByteBuffer.wrap(assetManager.open(ImageSegmentationHelper.MODEL_MOBILE_NET_DM05).use {
             it.readBytes()
         })
 
@@ -71,6 +71,11 @@ class ImageSegmenterViewModel(
         with(metadataExtractor) {
             with(metadataStringBuilder) {
                 appendLine("Has metadata? ${hasMetadata()}")
+
+                appendLine("Model name: ${modelMetadata.name()} (Version: ${modelMetadata.version()})")
+                appendLine("Model metadata description: ${modelMetadata.description()}")
+                appendLine()
+
 
                 appendLine("Input tensor count: $inputTensorCount")
 
@@ -109,8 +114,6 @@ class ImageSegmenterViewModel(
                     appendLine("Output tensor #$i dimension names vector: ${getOutputTensorMetadata(i)?.dimensionNamesVector()}")
                 }
 
-                appendLine("Model metadata description: ${modelMetadata.description()}")
-                appendLine("Model name: ${modelMetadata.name()} (Version: ${modelMetadata.version()})")
             }
 
         }
