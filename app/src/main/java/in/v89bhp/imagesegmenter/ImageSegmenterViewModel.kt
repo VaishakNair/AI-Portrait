@@ -171,6 +171,12 @@ class ImageSegmenterViewModel(
             if (!segmentationResult.results.isNullOrEmpty()) {
                 val segmentation = segmentationResult.results[0]
 
+                // Display label names with index:
+                segmentation.coloredLabels.forEachIndexed{
+                        index, coloredLabel ->
+                    Log.i(TAG, "$index : ${coloredLabel.getlabel()}")
+                }
+
                 val categoryMaskTensor =
                     segmentation.masks[0] // A single category mask with each pixel value corresponding
                 // to the category to which the pixel belongs
@@ -185,7 +191,7 @@ class ImageSegmenterViewModel(
 
                 for (i in categoryMaskArray.indices) {
                     pixels[i] =
-                        if (categoryMaskArray[i].toInt() != 15) Color.TRANSPARENT else Color.RED
+                        if (categoryMaskArray[i].toInt() != 15) Color.TRANSPARENT else Color.RED // TODO Change category index
                 }
 
                 val imageMask = Bitmap.createBitmap(
