@@ -207,7 +207,7 @@ class ImageSegmenterViewModel(
 
                 for (i in categoryMaskArray.indices) {
                     pixels[i] =
-                        if (categoryMaskArray[i] < 0.6) Color.TRANSPARENT else Color.RED
+                        if (categoryMaskArray[i] < 0.6) Color.TRANSPARENT else Color.RED  // TODO Modify the threshold as needed.
                 }
 
                 val imageMask = Bitmap.createBitmap(
