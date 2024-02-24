@@ -60,9 +60,10 @@ class ImageSegmenterViewModel(
 
     fun loadModelMetadata(context: Context) {
         val assetManager: AssetManager = context.assets
-        val metadataByteBuffer = ByteBuffer.wrap(assetManager.open(ImageSegmentationHelper.MODEL_MOBILE_NET_DM05).use {
-            it.readBytes()
-        })
+        val metadataByteBuffer =
+            ByteBuffer.wrap(assetManager.open(ImageSegmentationHelper.MODEL_MOBILE_NET_DM05).use {
+                it.readBytes()
+            })
 
         val metadataExtractor = MetadataExtractor(metadataByteBuffer)
 
@@ -81,7 +82,13 @@ class ImageSegmenterViewModel(
 
                 for (i in 0 until inputTensorCount) {
                     appendLine("Input tensor #$i description: ${getInputTensorMetadata(i)?.description()}")
-                    appendLine("Input tensor #$i shape: ${getInputTensorShape(i).joinToString(separator = " x ") { it.toString() }}")
+                    appendLine(
+                        "Input tensor #$i shape: ${
+                            getInputTensorShape(i).joinToString(
+                                separator = " x "
+                            ) { it.toString() }
+                        }"
+                    )
                     appendLine(
                         "Input tensor #$i quantization parameters: Scale: ${
                             getInputTensorQuantizationParams(
@@ -110,8 +117,20 @@ class ImageSegmenterViewModel(
                             ).scale
                         } Zero point: ${getOutputTensorQuantizationParams(i).zeroPoint}"
                     )
-                    appendLine("Output tensor #$i dimension names length: ${getOutputTensorMetadata(i)?.dimensionNamesLength()}")
-                    appendLine("Output tensor #$i dimension names vector: ${getOutputTensorMetadata(i)?.dimensionNamesVector()}")
+                    appendLine(
+                        "Output tensor #$i dimension names length: ${
+                            getOutputTensorMetadata(
+                                i
+                            )?.dimensionNamesLength()
+                        }"
+                    )
+                    appendLine(
+                        "Output tensor #$i dimension names vector: ${
+                            getOutputTensorMetadata(
+                                i
+                            )?.dimensionNamesVector()
+                        }"
+                    )
                 }
 
             }
@@ -174,33 +193,27 @@ class ImageSegmenterViewModel(
             if (!segmentationResult.results.isNullOrEmpty()) {
                 val segmentation = segmentationResult.results[0]
 
-                // Display label names with index:
-                segmentation.coloredLabels.forEachIndexed{
-                        index, coloredLabel ->
-                    Log.i(TAG, "$index : ${coloredLabel.getlabel()}")
-                }
-
-                val categoryMaskTensor =
-                    segmentation.masks[0] // A single category mask with each pixel value corresponding
-                // to the category to which the pixel belongs
+                val confidenceMaskTensor =
+                    segmentation.masks[0] // A single confidence mask with each pixel value corresponding
+                // to the probability of the pixel being background (close to 0.0) or foreground (close to 1.0)
                 Log.i(
                     TAG,
-                    "Category mask tensor width x height: ${categoryMaskTensor.width} x ${categoryMaskTensor.height}"
+                    "Confidence mask tensor width x height: ${confidenceMaskTensor.width} x ${confidenceMaskTensor.height}"
                 )
-                val categoryMaskArray = categoryMaskTensor.buffer.array()
-                Log.i(TAG, "Category mask array size: ${categoryMaskArray.size}")
+                val categoryMaskArray = confidenceMaskTensor.tensorBuffer.floatArray
+                Log.i(TAG, "Confidence mask array size: ${categoryMaskArray.size}")
 
                 val pixels = IntArray(categoryMaskArray.size)
 
                 for (i in categoryMaskArray.indices) {
                     pixels[i] =
-                        if (categoryMaskArray[i].toInt() != 15) Color.TRANSPARENT else Color.RED // TODO Change category index
+                        if (categoryMaskArray[i] < 0.6) Color.TRANSPARENT else Color.RED
                 }
 
                 val imageMask = Bitmap.createBitmap(
                     pixels,
-                    categoryMaskTensor.width,
-                    categoryMaskTensor.height,
+                    confidenceMaskTensor.width,
+                    confidenceMaskTensor.height,
                     Bitmap.Config.ARGB_8888
                 )
 

@@ -93,12 +93,12 @@ class ImageSegmentationHelper(
         OutputType, CONFIDENCE_MAP, provides a gray scale mapping of the image
         where each pixel has a confidence score applied to it from 0.0f to 1.0f
          */
-        optionsBuilder.setOutputType(OutputType.CATEGORY_MASK)
+        optionsBuilder.setOutputType(OutputType.CONFIDENCE_MASK)
         try {
             imageSegmenter =
                 ImageSegmenter.createFromFileAndOptions(
                     context,
-                    MODEL_MOBILE_NET_DM05, // TODO Specify model here
+                    MODEL_U2NET, // TODO Specify model here
                     optionsBuilder.build()
                 )
         } catch (e: IllegalStateException) {
@@ -157,6 +157,7 @@ class ImageSegmentationHelper(
         const val DELEGATE_NNAPI = 2
         const val MODEL_MOBILE_NET_DM05 = "lite-model_deeplabv3-mobilenetv2_dm05_1_default_2.tflite"
         const val MODEL_DEEPLAB_XCEPTION65 = "lite-model_deeplabv3-xception65_1_default_2.tflite"
+        const val MODEL_U2NET = "40_with_metadata.tflite"
 
         private const val TAG = "Image Segmentation Helper"
     }
