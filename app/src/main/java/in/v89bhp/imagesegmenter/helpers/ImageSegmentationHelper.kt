@@ -155,9 +155,7 @@ class ImageSegmentationHelper(
         const val DELEGATE_CPU = 0
         const val DELEGATE_GPU = 1
         const val DELEGATE_NNAPI = 2
-        const val MODEL_MOBILE_NET_DM05 = "lite-model_deeplabv3-mobilenetv2_dm05_1_default_2.tflite"
-        const val MODEL_DEEPLAB_XCEPTION65 = "lite-model_deeplabv3-xception65_1_default_2.tflite"
-        const val MODEL_U2NET = "40_with_metadata.tflite"
+        const val MODEL_U2NET = "20_with_metadata.tflite"
 
         private const val TAG = "Image Segmentation Helper"
     }

@@ -58,109 +58,15 @@ class ImageSegmenterViewModel(
 
     var modelMetadata by mutableStateOf("")
 
-    fun loadModelMetadata(context: Context) {
-        val assetManager: AssetManager = context.assets
-        val metadataByteBuffer =
-            ByteBuffer.wrap(assetManager.open(ImageSegmentationHelper.MODEL_MOBILE_NET_DM05).use {
-                it.readBytes()
-            })
-
-        val metadataExtractor = MetadataExtractor(metadataByteBuffer)
-
-        val metadataStringBuilder = StringBuilder()
-
-        with(metadataExtractor) {
-            with(metadataStringBuilder) {
-                appendLine("Has metadata? ${hasMetadata()}")
-
-                appendLine("Model name: ${modelMetadata.name()} (Version: ${modelMetadata.version()})")
-                appendLine("Model metadata description: ${modelMetadata.description()}")
-                appendLine()
-
-
-                appendLine("Input tensor count: $inputTensorCount")
-
-                for (i in 0 until inputTensorCount) {
-                    appendLine("Input tensor #$i description: ${getInputTensorMetadata(i)?.description()}")
-                    appendLine(
-                        "Input tensor #$i shape: ${
-                            getInputTensorShape(i).joinToString(
-                                separator = " x "
-                            ) { it.toString() }
-                        }"
-                    )
-                    appendLine(
-                        "Input tensor #$i quantization parameters: Scale: ${
-                            getInputTensorQuantizationParams(
-                                i
-                            ).scale
-                        } Zero point: ${getInputTensorQuantizationParams(i).zeroPoint}"
-                    )
-                    appendLine("Input tensor #$i dimension names length: ${getInputTensorMetadata(i)?.dimensionNamesLength()}")
-                }
-
-
-                appendLine("Output tensor count: $outputTensorCount")
-                for (i in 0 until outputTensorCount) {
-                    appendLine("Output tensor #$i description: ${getOutputTensorMetadata(i)?.description()}")
-                    appendLine(
-                        "Output tensor #$i shape: ${
-                            getOutputTensorShape(i).joinToString(
-                                separator = " x "
-                            ) { it.toString() }
-                        }"
-                    )
-                    appendLine(
-                        "Output tensor #$i quantization parameters: Scale: ${
-                            getOutputTensorQuantizationParams(
-                                i
-                            ).scale
-                        } Zero point: ${getOutputTensorQuantizationParams(i).zeroPoint}"
-                    )
-                    appendLine(
-                        "Output tensor #$i dimension names length: ${
-                            getOutputTensorMetadata(
-                                i
-                            )?.dimensionNamesLength()
-                        }"
-                    )
-                    appendLine(
-                        "Output tensor #$i dimension names vector: ${
-                            getOutputTensorMetadata(
-                                i
-                            )?.dimensionNamesVector()
-                        }"
-                    )
-                }
-
-            }
-
-        }
-
-        modelMetadata = metadataStringBuilder.toString()
-    }
-
-    fun getImageBitmap(context: Context): ImageBitmap {
-        if (imageBitmap == null) {
-            val assetManager: AssetManager = context.assets
-
-
-            imageBitmap = assetManager.open("sample_images/pp.jpg").use {
-                BitmapFactory.decodeStream(it).asImageBitmap()
-            }.also {
-                imageConfiguration = it.config.toString()
-                imageSize = "${it.width} x ${it.height}"
-                colorSpace = it.colorSpace.toString()
-
-            }
-        }
-        return imageBitmap!!
-    }
 
     private val onError: (errorMessage: String) -> Unit = { errorMessage ->
         TODO("Not yet implemented")
     }
 
+
+    fun loadModelMetadata(context: Context) { // TODO
+        modelMetadata = "To be computed"
+    }
 
     fun loadImage(context: Context, imageUri: Uri) {
         backgroundRemoved = false
