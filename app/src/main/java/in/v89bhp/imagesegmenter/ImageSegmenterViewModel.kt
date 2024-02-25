@@ -143,7 +143,7 @@ class ImageSegmenterViewModel(
     }
 
     private suspend fun applyMask(scaledImageMask: Bitmap) = withContext(Dispatchers.IO) {
-        val outputBitmap =
+        var outputBitmap =
             imageBitmap!!.asAndroidBitmap().let {// Make a mutable copy of the input bitmap.
                 it.copy(it.config, true)
             }
@@ -156,8 +156,31 @@ class ImageSegmenterViewModel(
                 }
             }
         }
-
+        outputBitmap = smoothEdges(outputBitmap)
         outputBitmap.asImageBitmap()
+    }
+
+    fun smoothEdges(outputBitmap: Bitmap): Bitmap {
+        val smoothedBitmap = outputBitmap.copy(outputBitmap.config, true)
+
+        for (rowIndex in 0 until outputBitmap.height) {
+            for (columnIndex in 0 until outputBitmap.width) {
+                val maskValue = outputBitmap[columnIndex, rowIndex]
+                if (maskValue == Color.TRANSPARENT) {
+                    try {
+                        if (outputBitmap[columnIndex + 1, rowIndex] != Color.TRANSPARENT) {
+                            // TODO Edge detected. Do smoothing
+                        }
+                    } catch (e: IllegalArgumentException) {
+                        // Do nothing
+                    }
+
+//                    outputBitmap[columnIndex, rowIndex] = maskValue
+                }
+            }
+        }
+
+        return smoothedBitmap
     }
 
 
