@@ -17,3 +17,4 @@ local.properties
 gradle/
 gradlew
 gradlew.bat
+app/src/main/java/in/v89bhp/imagesegmenter/KotlinCoder.kt
