@@ -16,6 +16,7 @@ import androidx.core.graphics.get
 import androidx.core.graphics.set
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import `in`.v89bhp.imagesegmenter.extensions.smoothenTransparentEdges
 import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
@@ -152,97 +153,9 @@ class ImageSegmenterViewModel(
                 }
             }
         }
-        outputBitmap = smoothEdges(outputBitmap)
+        outputBitmap = outputBitmap.smoothenTransparentEdges()
         outputBitmap.asImageBitmap()
     }
-
-//    fun smoothEdges(outputBitmap: Bitmap): Bitmap {
-//        val smoothedBitmap = outputBitmap.copy(outputBitmap.config, true)
-//        val a: Long = 0xff000f00
-//        Log.i(TAG, Color.green(a.toInt()).toString())
-//        for (rowIndex in 0 until outputBitmap.height) {
-//            for (columnIndex in 0 until outputBitmap.width) {
-//                val maskValue = outputBitmap[columnIndex, rowIndex]
-//                if (maskValue == Color.TRANSPARENT) {
-//                    try {
-//                        if (outputBitmap[columnIndex + 1, rowIndex] != Color.TRANSPARENT) {
-//                            // TODO Edge detected. Do smoothing
-//                            val pixels = arrayOf(9).toIntArray()
-//                            outputBitmap.getPixels(pixels, 0, 3, columnIndex + 1, rowIndex -1, 3, 3)
-//                        }
-//                    } catch (e: IllegalArgumentException) {
-//                        // Do nothing
-//                    }
-//
-////                    outputBitmap[columnIndex, rowIndex] = maskValue
-//                }
-//            }
-//        }
-//
-//        return smoothedBitmap
-//    }
-
-    fun smoothEdges(outputBitmap: Bitmap): Bitmap {
-        val smoothedBitmap = outputBitmap.copy(outputBitmap.config, true)
-//        val a: Long = 0xff000f00
-//        Log.i(TAG, Color.green(a.toInt()).toString())
-        for (rowIndex in 0 until outputBitmap.height) {
-            for (columnIndex in 0 until outputBitmap.width) {
-                val maskValue = outputBitmap[columnIndex, rowIndex]
-                if (maskValue == Color.TRANSPARENT) {
-                    try {
-                        if (outputBitmap[columnIndex + 1, rowIndex] != Color.TRANSPARENT) {
-                            // TODO Edge detected. Do smoothing
-                            val FILTER_SIZE = 5
-                            for (i in 1..20) {
-                                try {
-                                    val pixels = Array(FILTER_SIZE * FILTER_SIZE) { 0 }.toIntArray()
-                                    outputBitmap.getPixels(
-                                        pixels,
-                                        0,
-                                        FILTER_SIZE,
-                                        columnIndex + i,
-                                        rowIndex - 1,
-                                        FILTER_SIZE,
-                                        FILTER_SIZE
-                                    )
-                                    smoothedBitmap[columnIndex + i, rowIndex] =
-                                        getSmoothedPixelValue(pixels)
-                                } catch (e: IllegalArgumentException) {
-                                    // Do nothing
-                                }
-                            }
-
-                        }
-                    } catch (e: IllegalArgumentException) {
-                        // Do nothing
-                    }
-                }
-            }
-        }
-
-        return smoothedBitmap
-    }
-
-    fun getSmoothedPixelValue(pixels: IntArray): Int {
-        val alphas = mutableListOf<Int>()
-        val reds = mutableListOf<Int>()
-        val greens = mutableListOf<Int>()
-        val blues = mutableListOf<Int>()
-        for (pixel in pixels) {
-            alphas.add(Color.alpha(pixel))
-            reds.add(Color.red(pixel))
-            greens.add(Color.green(pixel))
-            blues.add(Color.blue(pixel))
-        }
-        return Color.argb(
-            alphas.average().toInt(),
-            reds.average().toInt(),
-            greens.average().toInt(),
-            blues.average().toInt()
-        )
-    }
-
 
     fun initializeImageSegmentationHelper(context: Context) {
         imageSegmentationHelper.setupImageSegmenter(context, onError)
