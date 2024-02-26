@@ -184,8 +184,8 @@ class ImageSegmenterViewModel(
 
     fun smoothEdges(outputBitmap: Bitmap): Bitmap {
         val smoothedBitmap = outputBitmap.copy(outputBitmap.config, true)
-        val a: Long = 0xff000f00
-        Log.i(TAG, Color.green(a.toInt()).toString())
+//        val a: Long = 0xff000f00
+//        Log.i(TAG, Color.green(a.toInt()).toString())
         for (rowIndex in 0 until outputBitmap.height) {
             for (columnIndex in 0 until outputBitmap.width) {
                 val maskValue = outputBitmap[columnIndex, rowIndex]
@@ -193,20 +193,46 @@ class ImageSegmenterViewModel(
                     try {
                         if (outputBitmap[columnIndex + 1, rowIndex] != Color.TRANSPARENT) {
                             // TODO Edge detected. Do smoothing
-                            val pixels = Array(9) {0}.toIntArray()
-                            outputBitmap.getPixels(pixels, 0, 3, columnIndex + 1, rowIndex -1, 3, 3)
-                            Log.i(TAG, Color.red(pixels[0]).toString())
+                            val pixels = Array(9) { 0 }.toIntArray()
+                            outputBitmap.getPixels(
+                                pixels,
+                                0,
+                                3,
+                                columnIndex + 1,
+                                rowIndex - 1,
+                                3,
+                                3
+                            )
+                            smoothedBitmap[columnIndex + 1, rowIndex] = getSmoothedPixelValue(pixels)
+//                            Log.i(TAG, Color.red(pixels[0]).toString())
                         }
                     } catch (e: IllegalArgumentException) {
                         // Do nothing
                     }
-
-//                    outputBitmap[columnIndex, rowIndex] = maskValue
                 }
             }
         }
 
         return smoothedBitmap
+    }
+
+    fun getSmoothedPixelValue(pixels: IntArray): Int {
+        val alphas = mutableListOf<Int>()
+        val reds = mutableListOf<Int>()
+        val greens = mutableListOf<Int>()
+        val blues = mutableListOf<Int>()
+        for (pixel in pixels) {
+            alphas.add(Color.alpha(pixel))
+            reds.add(Color.red(pixel))
+            greens.add(Color.green(pixel))
+            blues.add(Color.blue(pixel))
+        }
+        return Color.argb(
+            alphas.average().toInt(),
+            reds.average().toInt(),
+            greens.average().toInt(),
+            blues.average().toInt()
+        )
     }
 
 
