@@ -1,9 +1,7 @@
 package `in`.v89bhp.imagesegmenter
 
 import android.content.Context
-import android.content.res.AssetManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -27,8 +25,6 @@ import kotlinx.coroutines.withContext
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.metadata.MetadataExtractor
-import java.nio.ByteBuffer
 
 
 class ImageSegmenterViewModel(
@@ -160,9 +156,36 @@ class ImageSegmenterViewModel(
         outputBitmap.asImageBitmap()
     }
 
+//    fun smoothEdges(outputBitmap: Bitmap): Bitmap {
+//        val smoothedBitmap = outputBitmap.copy(outputBitmap.config, true)
+//        val a: Long = 0xff000f00
+//        Log.i(TAG, Color.green(a.toInt()).toString())
+//        for (rowIndex in 0 until outputBitmap.height) {
+//            for (columnIndex in 0 until outputBitmap.width) {
+//                val maskValue = outputBitmap[columnIndex, rowIndex]
+//                if (maskValue == Color.TRANSPARENT) {
+//                    try {
+//                        if (outputBitmap[columnIndex + 1, rowIndex] != Color.TRANSPARENT) {
+//                            // TODO Edge detected. Do smoothing
+//                            val pixels = arrayOf(9).toIntArray()
+//                            outputBitmap.getPixels(pixels, 0, 3, columnIndex + 1, rowIndex -1, 3, 3)
+//                        }
+//                    } catch (e: IllegalArgumentException) {
+//                        // Do nothing
+//                    }
+//
+////                    outputBitmap[columnIndex, rowIndex] = maskValue
+//                }
+//            }
+//        }
+//
+//        return smoothedBitmap
+//    }
+
     fun smoothEdges(outputBitmap: Bitmap): Bitmap {
         val smoothedBitmap = outputBitmap.copy(outputBitmap.config, true)
-
+        val a: Long = 0xff000f00
+        Log.i(TAG, Color.green(a.toInt()).toString())
         for (rowIndex in 0 until outputBitmap.height) {
             for (columnIndex in 0 until outputBitmap.width) {
                 val maskValue = outputBitmap[columnIndex, rowIndex]
@@ -170,6 +193,9 @@ class ImageSegmenterViewModel(
                     try {
                         if (outputBitmap[columnIndex + 1, rowIndex] != Color.TRANSPARENT) {
                             // TODO Edge detected. Do smoothing
+                            val pixels = Array(9) {0}.toIntArray()
+                            outputBitmap.getPixels(pixels, 0, 3, columnIndex + 1, rowIndex -1, 3, 3)
+                            Log.i(TAG, Color.red(pixels[0]).toString())
                         }
                     } catch (e: IllegalArgumentException) {
                         // Do nothing
