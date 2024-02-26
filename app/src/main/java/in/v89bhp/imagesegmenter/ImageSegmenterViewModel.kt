@@ -193,18 +193,26 @@ class ImageSegmenterViewModel(
                     try {
                         if (outputBitmap[columnIndex + 1, rowIndex] != Color.TRANSPARENT) {
                             // TODO Edge detected. Do smoothing
-                            val pixels = Array(9) { 0 }.toIntArray()
-                            outputBitmap.getPixels(
-                                pixels,
-                                0,
-                                3,
-                                columnIndex + 1,
-                                rowIndex - 1,
-                                3,
-                                3
-                            )
-                            smoothedBitmap[columnIndex + 1, rowIndex] = getSmoothedPixelValue(pixels)
-//                            Log.i(TAG, Color.red(pixels[0]).toString())
+                            val FILTER_SIZE = 5
+                            for (i in 1..20) {
+                                try {
+                                    val pixels = Array(FILTER_SIZE * FILTER_SIZE) { 0 }.toIntArray()
+                                    outputBitmap.getPixels(
+                                        pixels,
+                                        0,
+                                        FILTER_SIZE,
+                                        columnIndex + i,
+                                        rowIndex - 1,
+                                        FILTER_SIZE,
+                                        FILTER_SIZE
+                                    )
+                                    smoothedBitmap[columnIndex + i, rowIndex] =
+                                        getSmoothedPixelValue(pixels)
+                                } catch (e: IllegalArgumentException) {
+                                    // Do nothing
+                                }
+                            }
+
                         }
                     } catch (e: IllegalArgumentException) {
                         // Do nothing
