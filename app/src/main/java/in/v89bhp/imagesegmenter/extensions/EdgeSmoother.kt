@@ -8,6 +8,7 @@ import androidx.core.graphics.set
 
 // Size of blurring filter. FILTER_SIZE x FILTER_SIZE filter will be created:
 private const val FILTER_SIZE = 9
+
 // How many pixels starting at the edge pixel should be smoothened horizontally:
 private const val STRIDE = 10
 
@@ -23,15 +24,15 @@ fun Bitmap.smoothenTransparentEdges(): Bitmap {
                     try {
                         if (maskedBitmap[columnIndex + 1, rowIndex] != Color.TRANSPARENT) {
                             // Edge detected. Do smoothing:
-                            for (i in 1..STRIDE) {
+                            for (i in 1..STRIDE) { // Do smoothing for STRIDE pixels to the right starting from columnIndex + 1 pixel
                                 try {
                                     val pixels = Array(FILTER_SIZE * FILTER_SIZE) { 0 }.toIntArray()
                                     maskedBitmap.getPixels(
                                         pixels,
                                         0,
                                         FILTER_SIZE,
-                                        columnIndex + i,
-                                        rowIndex - 1,
+                                        (columnIndex + i) - ((FILTER_SIZE - 1) / 2),
+                                        rowIndex - ((FILTER_SIZE - 1) / 2),
                                         FILTER_SIZE,
                                         FILTER_SIZE
                                     )
@@ -63,6 +64,8 @@ fun getSmoothenedPixelValue(pixels: IntArray): Int {
     val blues = mutableListOf<Int>()
 
     for (pixel in pixels.filter { color -> Color.alpha(color) != 0xff }) { // Ignore opaque pixels from average computation
+//    for (pixel in pixels) {
+
         alphas.add(Color.alpha(pixel))
         reds.add(Color.red(pixel))
         greens.add(Color.green(pixel))
