@@ -15,7 +15,7 @@ fun Bitmap.smoothenTransparentEdges(): Bitmap {
     var smoothenedBitmap = this.copy(this.config, true)
     var maskedBitmap = this.copy(this.config, true)
 
-    for (i in 0 until 2) { // Two iterations for smoothening from left to right and from right to left (by rotating the image 180 degrees)
+    for (i in 0 until 2) { // Two iterations for smoothening from left to right and from right to left (by rotating the image clockwise by 180 degrees)
         for (rowIndex in 0 until maskedBitmap.height) {
             for (columnIndex in 0 until maskedBitmap.width) {
                 val maskValue = maskedBitmap[columnIndex, rowIndex]
@@ -61,12 +61,14 @@ fun getSmoothenedPixelValue(pixels: IntArray): Int {
     val reds = mutableListOf<Int>()
     val greens = mutableListOf<Int>()
     val blues = mutableListOf<Int>()
-    for (pixel in pixels) {
+
+    for (pixel in pixels.filter { color -> Color.alpha(color) != 0xff }) { // Ignore opaque pixels from average computation
         alphas.add(Color.alpha(pixel))
         reds.add(Color.red(pixel))
         greens.add(Color.green(pixel))
         blues.add(Color.blue(pixel))
     }
+
     return Color.argb(
         alphas.average().toInt(),
         reds.average().toInt(),
