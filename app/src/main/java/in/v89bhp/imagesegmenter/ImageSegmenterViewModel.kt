@@ -1,10 +1,12 @@
 package `in`.v89bhp.imagesegmenter
 
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +28,7 @@ import kotlinx.coroutines.withContext
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
+import java.io.FileOutputStream
 
 
 class ImageSegmenterViewModel(
@@ -80,6 +83,47 @@ class ImageSegmenterViewModel(
             }
         loadingImage = false
         imageLoaded = true
+    }
+
+    fun saveImage(context: Context) {
+        viewModelScope.launch(
+            context = coroutineDispatcher,
+            start = start
+        ) {
+            val resolver = context.applicationContext.contentResolver
+            val photoDetails = ContentValues().apply {
+                put(
+                    MediaStore.Images.Media.DISPLAY_NAME,
+                    "hash_hash.jpg"
+                ) // TODO Get file name from imageUri
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
+            val imagesCollection =
+                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+
+            val photoContentUri = resolver.insert(imagesCollection, photoDetails)
+
+            isProcessing = true
+
+            withContext(Dispatchers.IO) {
+                // Dump the image data to the actual file returned by MediaStore:
+                resolver.openFileDescriptor(photoContentUri!!, "w", null).use { fd ->
+                    FileOutputStream(fd!!.fileDescriptor).use { os ->
+                        imageBitmap!!.asAndroidBitmap().compress(
+                            Bitmap.CompressFormat.JPEG,
+                            100,
+                            os
+                        ) // TODO Modify compress format and quality
+                    }
+                }
+
+                // Photo dumped. Clear the IS_PENDING STATUS:
+                photoDetails.clear()
+                photoDetails.put(MediaStore.Images.Media.IS_PENDING, 0)
+                resolver.update(photoContentUri, photoDetails, null, null)
+            }
+            isProcessing = false
+        }
     }
 
     fun removeBackground() {

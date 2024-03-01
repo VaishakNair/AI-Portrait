@@ -138,7 +138,7 @@ fun ImageSegmenter(
                         ) {
 
                             ChooseImageButton(viewModel = viewModel)
-                            Button(onClick = { /*TODO*/ }) {
+                            Button(onClick = { viewModel.saveImage(context) }) {
                                 Text(text = stringResource(id = R.string.save))
                             }
                         }
