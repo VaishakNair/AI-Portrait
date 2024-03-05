@@ -19,11 +19,14 @@ import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +46,7 @@ fun ImageSegmenter(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
         viewModel.initializeImageSegmentationHelper(context)
@@ -69,10 +73,15 @@ fun ImageSegmenter(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = stringResource(R.string.model_metadata),
-                style = MaterialTheme.typography.headlineLarge)
+                Text(
+                    text = stringResource(R.string.model_metadata),
+                    style = MaterialTheme.typography.headlineLarge
+                )
                 Text(viewModel.modelMetadata)
             }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         },
         topBar = {
 
@@ -128,7 +137,9 @@ fun ImageSegmenter(
                     }
 
                     if (!viewModel.backgroundRemoved) {
-                        Button(onClick = { viewModel.removeBackground() }) {
+                        Button(onClick = {
+                            viewModel.removeBackground()
+                        }) {
                             Text(text = stringResource(id = R.string.remove_background))
                         }
                     } else {
