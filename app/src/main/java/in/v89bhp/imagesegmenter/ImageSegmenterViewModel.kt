@@ -69,6 +69,7 @@ class ImageSegmenterViewModel(
     }
 
     fun loadImage(context: Context, imageUri: Uri) {
+
         backgroundRemoved = false
         loadingImage = true
         val source: ImageDecoder.Source =
@@ -87,15 +88,13 @@ class ImageSegmenterViewModel(
 
     fun saveImage(context: Context) {
         viewModelScope.launch(
-            context = coroutineDispatcher,
-            start = start
+            context = coroutineDispatcher, start = start
         ) {
             val resolver = context.applicationContext.contentResolver
             val photoDetails = ContentValues().apply {
                 put(
-                    MediaStore.Images.Media.DISPLAY_NAME,
-                    "hash_hash.png"
-                ) // TODO Get file name from imageUri
+                    MediaStore.Images.Media.DISPLAY_NAME, "${System.currentTimeMillis()}.png"
+                )
                 put(MediaStore.Images.Media.IS_PENDING, 1)
             }
             val imagesCollection =
@@ -110,9 +109,7 @@ class ImageSegmenterViewModel(
                 resolver.openFileDescriptor(photoContentUri!!, "w", null).use { fd ->
                     FileOutputStream(fd!!.fileDescriptor).use { os ->
                         imageBitmap!!.asAndroidBitmap().apply { setHasAlpha(true) }.compress(
-                            Bitmap.CompressFormat.PNG,
-                            100,
-                            os
+                            Bitmap.CompressFormat.PNG, 100, os
                         )
                     }
                 }
@@ -129,8 +126,7 @@ class ImageSegmenterViewModel(
     fun removeBackground() {
         // Run in a IO dispatcher as a coroutine:
         viewModelScope.launch(
-            context = coroutineDispatcher,
-            start = start
+            context = coroutineDispatcher, start = start
         ) {
             isProcessing = true
             val segmentationResult =
@@ -207,12 +203,11 @@ class ImageSegmenterViewModel(
 
 
     fun rotateImage() {
-        val imageProcessor =
-            ImageProcessor.Builder()
+        val imageProcessor = ImageProcessor.Builder()
 //                .add(Rot90Op(1))
-                .add(ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
+            .add(ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
 
-                .build()
+            .build()
 
         imageBitmap =
             imageProcessor.process(TensorImage.fromBitmap(imageBitmap!!.asAndroidBitmap())).bitmap.asImageBitmap()
