@@ -94,7 +94,7 @@ class ImageSegmenterViewModel(
             val photoDetails = ContentValues().apply {
                 put(
                     MediaStore.Images.Media.DISPLAY_NAME,
-                    "hash_hash.jpg"
+                    "hash_hash.png"
                 ) // TODO Get file name from imageUri
                 put(MediaStore.Images.Media.IS_PENDING, 1)
             }
@@ -110,7 +110,7 @@ class ImageSegmenterViewModel(
                 resolver.openFileDescriptor(photoContentUri!!, "w", null).use { fd ->
                     FileOutputStream(fd!!.fileDescriptor).use { os ->
                         imageBitmap!!.asAndroidBitmap().compress(
-                            Bitmap.CompressFormat.JPEG,
+                            Bitmap.CompressFormat.PNG,
                             100,
                             os
                         ) // TODO Modify compress format and quality
