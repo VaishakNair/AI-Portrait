@@ -109,11 +109,11 @@ class ImageSegmenterViewModel(
                 // Dump the image data to the actual file returned by MediaStore:
                 resolver.openFileDescriptor(photoContentUri!!, "w", null).use { fd ->
                     FileOutputStream(fd!!.fileDescriptor).use { os ->
-                        imageBitmap!!.asAndroidBitmap().compress(
+                        imageBitmap!!.asAndroidBitmap().apply { setHasAlpha(true) }.compress(
                             Bitmap.CompressFormat.PNG,
                             100,
                             os
-                        ) // TODO Modify compress format and quality
+                        )
                     }
                 }
 
