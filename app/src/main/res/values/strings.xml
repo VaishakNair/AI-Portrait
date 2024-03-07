@@ -50,5 +50,6 @@
     <string name="file_saved">File saved to gallery</string>
     <string name="save">Save</string>
     <string name="model_metadata">Model Metadata</string>
+    <string name="image_dimension_error">Image should have a minimum size of 512 x 512.</string>
 
 </resources>

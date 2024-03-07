@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import `in`.v89bhp.imagesegmenter.extensions.smoothenTransparentEdges
 import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper
+import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper.Companion.IMAGE_HEIGHT
+import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper.Companion.IMAGE_WIDTH
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -51,6 +53,8 @@ class ImageSegmenterViewModel(
 
     var imageSaved by mutableStateOf(false)
 
+    var imageDimensionError by mutableStateOf(false)
+
     var imageConfiguration = ""
 
     var imageSize = ""
@@ -74,7 +78,10 @@ class ImageSegmenterViewModel(
 
         backgroundRemoved = false
         imageSaved = false
+        imageDimensionError = false
+        imageLoaded = false
         loadingImage = true
+
         val source: ImageDecoder.Source =
             ImageDecoder.createSource(context.contentResolver, imageUri)
         imageBitmap =
@@ -85,7 +92,15 @@ class ImageSegmenterViewModel(
                 imageSize = "${it.width} x ${it.height}"
                 colorSpace = it.colorSpace.toString()
             }
+
         loadingImage = false
+
+        if (imageBitmap!!.width < IMAGE_WIDTH || imageBitmap!!.height < IMAGE_HEIGHT) {
+            // Show error snackbar:
+            imageDimensionError = true
+            return
+        }
+
         imageLoaded = true
     }
 

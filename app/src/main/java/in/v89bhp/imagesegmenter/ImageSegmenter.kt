@@ -107,6 +107,14 @@ fun ImageSegmenter(
         if (viewModel.isProcessing || viewModel.loadingImage) {
             CircularProgress(text = stringResource(id = if (viewModel.isProcessing) R.string.processing else R.string.loading_image))
         } else {
+
+            if (viewModel.imageDimensionError) {
+                val message = stringResource(id = R.string.image_dimension_error)
+                LaunchedEffect(key1 = snackbarHostState) {
+                    snackbarHostState.showSnackbar(message = message)
+                }
+            }
+
             Column(
                 modifier = modifier
                     .padding(contentPadding)
@@ -192,6 +200,7 @@ fun ChooseImageButton(
     Button(
         modifier = modifier,
         onClick = {
+            viewModel.imageDimensionError = false
             launcher.launch(
                 PickVisualMediaRequest.Builder()
                     .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly)
