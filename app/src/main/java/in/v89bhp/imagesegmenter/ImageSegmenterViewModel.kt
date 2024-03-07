@@ -49,6 +49,8 @@ class ImageSegmenterViewModel(
 
     var backgroundRemoved by mutableStateOf(false)
 
+    var imageSaved by mutableStateOf(false)
+
     var imageConfiguration = ""
 
     var imageSize = ""
@@ -71,6 +73,7 @@ class ImageSegmenterViewModel(
     fun loadImage(context: Context, imageUri: Uri) {
 
         backgroundRemoved = false
+        imageSaved = false
         loadingImage = true
         val source: ImageDecoder.Source =
             ImageDecoder.createSource(context.contentResolver, imageUri)
@@ -120,6 +123,7 @@ class ImageSegmenterViewModel(
                 resolver.update(photoContentUri, photoDetails, null, null)
             }
             isProcessing = false
+            imageSaved = true
         }
     }
 

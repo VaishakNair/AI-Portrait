@@ -149,8 +149,17 @@ fun ImageSegmenter(
                         ) {
 
                             ChooseImageButton(viewModel = viewModel)
-                            Button(onClick = { viewModel.saveImage(context) }) {
+                            Button(
+                                onClick = { viewModel.saveImage(context) },
+                                enabled = viewModel.imageSaved.not()
+                            ) {
                                 Text(text = stringResource(id = R.string.save))
+                            }
+                        }
+                        if (viewModel.imageSaved) {
+                            val message = stringResource(id = R.string.file_saved)
+                            LaunchedEffect(key1 = snackbarHostState) {
+                                snackbarHostState.showSnackbar(message = message)
                             }
                         }
                     }
