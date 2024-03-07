@@ -137,10 +137,16 @@ fun ImageSegmenter(
                     }
 
                     if (!viewModel.backgroundRemoved) {
-                        Button(onClick = {
-                            viewModel.removeBackground()
-                        }) {
-                            Text(text = stringResource(id = R.string.remove_background))
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            Button(onClick = {
+                                viewModel.removeBackground()
+                            }) {
+                                Text(text = stringResource(id = R.string.remove_background))
+                            }
+                            ChooseImageButton(viewModel = viewModel)
                         }
                     } else {
                         Row(
