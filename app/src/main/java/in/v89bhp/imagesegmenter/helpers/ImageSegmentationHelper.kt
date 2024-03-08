@@ -127,7 +127,8 @@ class ImageSegmentationHelper(
             val imageProcessor =
                 ImageProcessor.Builder()
                     .add(Rot90Op(-imageRotation / 90))
-
+                    // No need to Resize the image as it will be done by ImageSegmenter. Also the alpha channel will be discarded
+                    // when the image gets converted into a TensorImage (TensorImage.fromBitmap(image)) below:
                     .build()
 
             // Preprocess the image and convert it into a TensorImage for segmentation.
