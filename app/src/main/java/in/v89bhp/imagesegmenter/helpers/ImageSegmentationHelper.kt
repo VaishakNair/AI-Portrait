@@ -158,7 +158,8 @@ class ImageSegmentationHelper(
         const val DELEGATE_GPU = 1
         const val DELEGATE_NNAPI = 2
 
-        const val MODEL_U2NET = "20_with_metadata.tflite"
+//        const val MODEL_U2NET = "20_with_metadata.tflite"
+        const val MODEL_U2NET = "40_with_metadata.tflite"
         const val IMAGE_WIDTH = 512
         const val IMAGE_HEIGHT = 512
 
