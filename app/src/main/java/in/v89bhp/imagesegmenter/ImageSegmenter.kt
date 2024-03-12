@@ -150,7 +150,8 @@ fun ImageSegmenter(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             Button(onClick = {
-                                viewModel.removeBackground()
+//                                viewModel.removeBackground()
+                                viewModel.enhanceResolution()
                             }) {
                                 Text(text = stringResource(id = R.string.remove_background))
                             }

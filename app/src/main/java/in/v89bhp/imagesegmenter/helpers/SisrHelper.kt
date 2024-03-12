@@ -1,10 +1,9 @@
 package `in`.v89bhp.imagesegmenter.helpers
 
-import android.R.id.input
-import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.image.ImageProcessor
@@ -31,9 +30,11 @@ class SisrHelper(
         return imageProcessor.process(TensorImage.fromBitmap(image))
     }
 
-    suspend fun enhanceResolution(image: Bitmap): Bitmap {
-        withContext(coroutineDispatcher) {
+    suspend fun enhanceResolution(image: Bitmap): ImageBitmap {
+        return withContext(coroutineDispatcher) {
             val preprocessedTensorImage = preprocessImage(image)
+            val outputHeight = preprocessedTensorImage.height * 4
+            val outputWidth = preprocessedTensorImage.width * 4
             val input = preprocessedTensorImage.tensorBuffer.buffer
             val output = ByteBuffer.allocate(input.capacity() * 4 * 4)
 
@@ -43,7 +44,25 @@ class SisrHelper(
                     output
                 )
             }
+            getOutputImage(output, outputHeight, outputWidth).asImageBitmap()
 
         }
+    }
+
+    private fun getOutputImage(output: ByteBuffer, height: Int, width: Int): Bitmap {
+        output.rewind()
+        val outputWidth = width
+        val outputHeight = height
+        val bitmap = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888)
+        val pixels = IntArray(outputWidth * outputHeight)
+        for (i in 0 until (outputWidth * outputHeight)) {
+            val a = 0xFF
+            val r = output.float * 255.0f
+            val g = output.float * 255.0f
+            val b = output.float * 255.0f
+            pixels[i] = a shl 24 or (r.toInt() shl 16) or (g.toInt() shl 8) or b.toInt()
+        }
+        bitmap.setPixels(pixels, 0, outputWidth, 0, 0, outputWidth, outputHeight)
+        return bitmap
     }
 }

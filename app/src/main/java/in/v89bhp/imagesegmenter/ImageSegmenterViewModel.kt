@@ -96,12 +96,12 @@ class ImageSegmenterViewModel(
             }
 
         loadingImage = false
-
-        if (imageBitmap!!.width < IMAGE_WIDTH || imageBitmap!!.height < IMAGE_HEIGHT) {
-            // Show error snackbar:
-            imageDimensionError = true
-            return
-        }
+// TODO Uncomment
+//        if (imageBitmap!!.width < IMAGE_WIDTH || imageBitmap!!.height < IMAGE_HEIGHT) {
+//            // Show error snackbar:
+//            imageDimensionError = true
+//            return
+//        }
 
         imageLoaded = true
     }
@@ -150,9 +150,10 @@ class ImageSegmenterViewModel(
         ) {
             isProcessing = true
 
-            val enhancedImage = sisrHelper.enhanceResolution(imageBitmap!!.asAndroidBitmap())
-
+            val enhancedImageBitmap = sisrHelper.enhanceResolution(imageBitmap!!.asAndroidBitmap())
+            imageBitmap = enhancedImageBitmap
             isProcessing = false
+            backgroundRemoved = true
         }
     }
 
