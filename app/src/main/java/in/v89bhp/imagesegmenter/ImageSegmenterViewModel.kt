@@ -22,6 +22,7 @@ import `in`.v89bhp.imagesegmenter.extensions.smoothenTransparentEdges
 import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper
 import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper.Companion.IMAGE_HEIGHT
 import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper.Companion.IMAGE_WIDTH
+import `in`.v89bhp.imagesegmenter.helpers.SisrHelper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +39,8 @@ class ImageSegmenterViewModel(
     private val start: CoroutineStart = CoroutineStart.DEFAULT,
     private val imageSegmentationHelper: ImageSegmentationHelper = ImageSegmentationHelper(
         coroutineDispatcher = Dispatchers.IO
-    )
+    ),
+    private val sisrHelper: SisrHelper = SisrHelper(coroutineDispatcher=Dispatchers.IO)
 ) : ViewModel() {
 
     var imageBitmap: ImageBitmap? by mutableStateOf(null)
@@ -139,6 +141,18 @@ class ImageSegmenterViewModel(
             }
             isProcessing = false
             imageSaved = true
+        }
+    }
+
+    fun enhanceResolution() {
+        viewModelScope.launch(
+            context = coroutineDispatcher, start = start
+        ) {
+            isProcessing = true
+
+            val enhancedImage = sisrHelper.enhanceResolution(imageBitmap!!.asAndroidBitmap())
+
+            isProcessing = false
         }
     }
 
