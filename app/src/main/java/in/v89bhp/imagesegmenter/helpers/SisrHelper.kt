@@ -57,6 +57,7 @@ class SisrHelper(
         val pixels = IntArray(outputWidth * outputHeight)
         for (i in 0 until (outputWidth * outputHeight)) {
             val a = 0xFF
+            // TODO May need to remove the * 255.0f part
             val r = output.float * 255.0f
             val g = output.float * 255.0f
             val b = output.float * 255.0f
