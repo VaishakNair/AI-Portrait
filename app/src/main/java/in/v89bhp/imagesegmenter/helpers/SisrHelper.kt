@@ -51,11 +51,9 @@ class SisrHelper(
 
     private fun getOutputImage(output: ByteBuffer, height: Int, width: Int): Bitmap {
         output.rewind()
-        val outputWidth = width
-        val outputHeight = height
-        val bitmap = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888)
-        val pixels = IntArray(outputWidth * outputHeight)
-        for (i in 0 until (outputWidth * outputHeight)) {
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val pixels = IntArray(width * height)
+        for (i in 0 until (width * height)) {
             val a = 0xFF
             // TODO May need to remove the * 255.0f part
             val r = output.float * 255.0f
@@ -63,7 +61,7 @@ class SisrHelper(
             val b = output.float * 255.0f
             pixels[i] = a shl 24 or (r.toInt() shl 16) or (g.toInt() shl 8) or b.toInt()
         }
-        bitmap.setPixels(pixels, 0, outputWidth, 0, 0, outputWidth, outputHeight)
+        bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
         return bitmap
     }
 }
