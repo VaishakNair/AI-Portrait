@@ -235,6 +235,10 @@ class ImageSegmenterViewModel(
         imageSegmentationHelper.setupImageSegmenter(context, onError)
     }
 
+    fun initializeSisrHelper(context: Context) {
+        sisrHelper.setup(context)
+    }
+
 
     fun rotateImage() {
         val imageProcessor = ImageProcessor.Builder()

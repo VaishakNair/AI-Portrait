@@ -50,6 +50,7 @@ fun ImageSegmenter(
 
     LaunchedEffect(key1 = true) {
         viewModel.initializeImageSegmentationHelper(context)
+        viewModel.initializeSisrHelper(context)
         viewModel.loadModelMetadata(context)
     }
 
