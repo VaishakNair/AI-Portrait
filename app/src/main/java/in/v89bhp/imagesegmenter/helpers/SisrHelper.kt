@@ -36,7 +36,7 @@ class SisrHelper(
         val imageProcessor =
             ImageProcessor.Builder()
 //                .add(ResizeOp(targetHeight, targetWidth, ResizeOp.ResizeMethod.BILINEAR))
-                .add(ResizeOp(50, 50, ResizeOp.ResizeMethod.BILINEAR))
+                .add(ResizeOp(300, 200, ResizeOp.ResizeMethod.BILINEAR))
                 .build()
         // The alpha channel will be discarded
         // when the image gets converted into a TensorImage (TensorImage.fromBitmap(image)) below:
@@ -44,6 +44,17 @@ class SisrHelper(
         val tensorImage = TensorImage(DataType.FLOAT32)
         tensorImage.load(image)
         return imageProcessor.process(tensorImage)
+    }
+
+    /** Memory-map the model file in Assets.  */
+
+    private fun loadModelFile(): MappedByteBuffer {
+        val fileDescriptor = context.assets.openFd("sr.tflite")
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel = inputStream.channel
+        val startOffset = fileDescriptor.startOffset
+        val declaredLength = fileDescriptor.declaredLength
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
     suspend fun enhanceResolution(image: Bitmap): ImageBitmap {
@@ -65,30 +76,21 @@ class SisrHelper(
         }
     }
 
-    /** Memory-map the model file in Assets.  */
-
-    private fun loadModelFile(): MappedByteBuffer {
-        val fileDescriptor = context.assets.openFd("ESRGAN.tflite")
-        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
-        val fileChannel = inputStream.channel
-        val startOffset = fileDescriptor.startOffset
-        val declaredLength = fileDescriptor.declaredLength
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
-    }
-
     private fun getOutputImage(output: ByteBuffer, height: Int, width: Int): Bitmap {
         output.rewind()
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val pixels = IntArray(width * height)
+        val minValue = 0f
+        val maxValue = 255f
         for (i in 0 until (width * height)) {
             val a = 0xFF
             // TODO May need to remove the * 255.0f part
 //            val r = output.float * 255.0f
 //            val g = output.float * 255.0f
 //            val b = output.float * 255.0f
-            val r = output.float.coerceIn(0f, 255f)
-            val g = output.float.coerceIn(0f, 255f)
-            val b = output.float.coerceIn(0f, 255f)
+            val r = output.float.coerceIn(minValue, maxValue)
+            val g = output.float.coerceIn(minValue, maxValue)
+            val b = output.float.coerceIn(minValue, maxValue)
             pixels[i] = a shl 24 or (r.toInt() shl 16) or (g.toInt() shl 8) or b.toInt()
         }
         bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
