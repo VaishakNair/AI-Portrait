@@ -1,6 +1,5 @@
 package `in`.v89bhp.imagesegmenter.helpers
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.ui.graphics.ImageBitmap
@@ -12,12 +11,12 @@ import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-import java.io.File
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.FileInputStream
-import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
+import java.util.Arrays
 
 
 class SisrHelper(
@@ -57,23 +56,91 @@ class SisrHelper(
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
     }
 
+//    suspend fun enhanceResolution(image: Bitmap): ImageBitmap {
+//        return withContext(coroutineDispatcher) {
+//            val preprocessedTensorImage = preprocessImage(image)
+//            val outputHeight = preprocessedTensorImage.height * 4
+//            val outputWidth = preprocessedTensorImage.width * 4
+//            val input = preprocessedTensorImage.tensorBuffer.buffer
+//            val output = ByteBuffer.allocate(input.capacity() * 4 * 4)
+//
+//            Interpreter(loadModelFile()).use { interpreter ->
+//                interpreter.run(
+//                    input,
+//                    output
+//                )
+//            }
+//            getOutputImage(output, outputHeight, outputWidth).asImageBitmap()
+//
+//        }
+//    }
+
     suspend fun enhanceResolution(image: Bitmap): ImageBitmap {
         return withContext(coroutineDispatcher) {
             val preprocessedTensorImage = preprocessImage(image)
             val outputHeight = preprocessedTensorImage.height * 4
             val outputWidth = preprocessedTensorImage.width * 4
             val input = preprocessedTensorImage.tensorBuffer.buffer
-            val output = ByteBuffer.allocate(input.capacity() * 4 * 4)
-
+//            val output = ByteBuffer.allocate(input.capacity() * 4 * 4)
+            val output =
+                TensorBuffer.createFixedSize(intArrayOf(1200, 800, 3), DataType.FLOAT32)
             Interpreter(loadModelFile()).use { interpreter ->
                 interpreter.run(
                     input,
-                    output
+                    output.buffer
                 )
             }
-            getOutputImage(output, outputHeight, outputWidth).asImageBitmap()
+            val outBitmap = Bitmap.createBitmap(
+                800,
+                1200, Bitmap.Config.ARGB_8888
+            )
+            convertTensorBufferToBitmap(output,outBitmap)
+            outBitmap.asImageBitmap()
+//            getOutputImage(output, outputHeight, outputWidth).asImageBitmap()
 
         }
+    }
+
+    fun convertTensorBufferToBitmap(buffer: TensorBuffer, bitmap: Bitmap) {
+//        if (buffer.dataType != DataType.UINT8) {
+//            // We will add support to FLOAT format conversion in the future, as it may need other configs.
+//            throw UnsupportedOperationException(
+//                String.format(
+//                    "Converting TensorBuffer of type %s to Bitmap is not supported yet.",
+//                    buffer.dataType
+//                )
+//            )
+//        }
+        val shape = buffer.shape
+        require(shape.size == 3 && shape[0] > 0 && shape[1] > 0 && shape[2] == 3) {
+            String.format(
+                "Buffer shape %s is not valid. 3D TensorBuffer with shape [w, h, 3] is required",
+                Arrays.toString(shape)
+            )
+        }
+        val h = shape[0]
+        val w = shape[1]
+        require(!(bitmap.width != w || bitmap.height != h)) {
+            String.format(
+                "Given bitmap has different width or height %s with the expected ones %s.",
+                Arrays.toString(intArrayOf(bitmap.width, bitmap.height)),
+                Arrays.toString(intArrayOf(w, h))
+            )
+        }
+        require(bitmap.isMutable) { "Given bitmap is not mutable" }
+        // TODO(b/138904567): Find a way to avoid creating multiple intermediate buffers every time.
+        val intValues = IntArray(w * h)
+        val rgbValues = buffer.floatArray
+        var i = 0
+        var j = 0
+        while (i < intValues.size) {
+            val r = rgbValues[j++].coerceIn(0f, 255f).toInt().toByte()
+            val g = rgbValues[j++].coerceIn(0f, 255f).toInt().toByte()
+            val b = rgbValues[j++].coerceIn(0f, 255f).toInt().toByte()
+            intValues[i] = r.toInt() shl 16 or (g.toInt() shl 8) or b.toInt()
+            i++
+        }
+        bitmap.setPixels(intValues, 0, w, 0, 0, w, h)
     }
 
     private fun getOutputImage(output: ByteBuffer, height: Int, width: Int): Bitmap {
