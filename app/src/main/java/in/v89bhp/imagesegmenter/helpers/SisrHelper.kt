@@ -17,6 +17,7 @@ import java.nio.ByteBuffer
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 import java.util.Arrays
+import kotlin.math.roundToInt
 
 
 class SisrHelper(
@@ -88,15 +89,16 @@ class SisrHelper(
                 interpreter.run(
                     input,
                     output.buffer
+
                 )
             }
             val outBitmap = Bitmap.createBitmap(
                 800,
                 1200, Bitmap.Config.ARGB_8888
             )
-            convertTensorBufferToBitmap(output,outBitmap)
-            outBitmap.asImageBitmap()
-//            getOutputImage(output, outputHeight, outputWidth).asImageBitmap()
+//            convertTensorBufferToBitmap(output,outBitmap)
+//            outBitmap.asImageBitmap()
+            getOutputImage(output, outputHeight, outputWidth).asImageBitmap()
 
         }
     }
@@ -143,9 +145,13 @@ class SisrHelper(
         bitmap.setPixels(intValues, 0, w, 0, 0, w, h)
     }
 
-    private fun getOutputImage(output: ByteBuffer, height: Int, width: Int): Bitmap {
+    private fun getOutputImageBackup(output: ByteBuffer, height: Int, width: Int): Bitmap {
         output.rewind()
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmap = Bitmap.createBitmap(
+            width,
+            height,
+            Bitmap.Config.ARGB_8888
+        )
         val pixels = IntArray(width * height)
         val minValue = 0f
         val maxValue = 255f
@@ -159,6 +165,33 @@ class SisrHelper(
             val g = output.float.coerceIn(minValue, maxValue)
             val b = output.float.coerceIn(minValue, maxValue)
             pixels[i] = a shl 24 or (r.toInt() shl 16) or (g.toInt() shl 8) or b.toInt()
+        }
+        bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
+        return bitmap
+    }
+
+    private fun getOutputImage(output: TensorBuffer, height: Int, width: Int): Bitmap {
+//        output.rewind()
+        val bitmap = Bitmap.createBitmap(
+            width,
+            height,
+            Bitmap.Config.ARGB_8888
+        )
+        val pixels = IntArray(width * height)
+        val minValue = 0f
+        val maxValue = 255f
+        val rgbValues = output.floatArray
+        var j = 0
+        val a = 0xFF
+        for (i in 0 until (width * height)) {
+            // TODO May need to remove the * 255.0f part
+//            val r = output.float * 255.0f
+//            val g = output.float * 255.0f
+//            val b = output.float * 255.0f
+            val r = rgbValues[j++].coerceIn(minValue, maxValue).roundToInt().toByte()
+            val g = rgbValues[j++].coerceIn(minValue, maxValue).roundToInt().toByte()
+            val b = rgbValues[j++].coerceIn(minValue, maxValue).roundToInt().toByte()
+            pixels[i] = (a shl 24) or (r.toInt() shl 16) or (g.toInt() shl 8) or b.toInt()
         }
         bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
         return bitmap
