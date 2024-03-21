@@ -84,7 +84,7 @@ class SisrHelper(
             val input = preprocessedTensorImage.tensorBuffer.buffer
 //            val output = ByteBuffer.allocate(input.capacity() * 4 * 4)
             val output =
-                TensorBuffer.createFixedSize(intArrayOf(1200, 800, 3), DataType.FLOAT32)
+                TensorBuffer.createFixedSize(intArrayOf(1200, 800, 3), DataType.UINT8)
             Interpreter(loadModelFile()).use { interpreter ->
                 interpreter.run(
                     input,
@@ -178,20 +178,14 @@ class SisrHelper(
             Bitmap.Config.ARGB_8888
         )
         val pixels = IntArray(width * height)
-        val minValue = 0f
-        val maxValue = 255f
-        val rgbValues = output.floatArray
+        val rgbValues = output.intArray
         var j = 0
         val a = 0xFF
         for (i in 0 until (width * height)) {
-            // TODO May need to remove the * 255.0f part
-//            val r = output.float * 255.0f
-//            val g = output.float * 255.0f
-//            val b = output.float * 255.0f
-            val r = rgbValues[j++].coerceIn(minValue, maxValue).roundToInt().toByte()
-            val g = rgbValues[j++].coerceIn(minValue, maxValue).roundToInt().toByte()
-            val b = rgbValues[j++].coerceIn(minValue, maxValue).roundToInt().toByte()
-            pixels[i] = (a shl 24) or (r.toInt() shl 16) or (g.toInt() shl 8) or b.toInt()
+            val r = rgbValues[j++]
+            val g = rgbValues[j++]
+            val b = rgbValues[j++]
+            pixels[i] = (a shl 24) or (r shl 16) or (g shl 8) or b
         }
         bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
         return bitmap
