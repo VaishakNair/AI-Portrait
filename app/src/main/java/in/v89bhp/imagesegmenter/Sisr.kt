@@ -34,15 +34,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper
+import `in`.v89bhp.imagesegmenter.helpers.SisrHelper
 import `in`.v89bhp.imagesegmenter.ui.progressbars.CircularProgress
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun ImageSegmenter(
+fun Sisr(
     modifier: Modifier = Modifier,
-    viewModel: ImageSegmenterViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: SisrViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -50,7 +50,7 @@ fun ImageSegmenter(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
-        viewModel.initializeImageSegmentationHelper(context)
+        viewModel.initializeSisrHelper(context)
         viewModel.loadModelMetadata(context)
     }
 
@@ -88,7 +88,7 @@ fun ImageSegmenter(
 
             TopAppBar(
                 title = {
-                    Text(text = stringResource(R.string.app_name))
+                    Text(text = stringResource(R.string.sisr))
                 },
                 actions = {
 
@@ -110,7 +110,7 @@ fun ImageSegmenter(
         } else {
 
             if (viewModel.imageDimensionError) {
-                val message = stringResource(id = R.string.image_dimension_error, ImageSegmentationHelper.IMAGE_HEIGHT, ImageSegmentationHelper.IMAGE_WIDTH)
+                val message = stringResource(id = R.string.image_dimension_error, SisrHelper.IMAGE_HEIGHT, SisrHelper.IMAGE_WIDTH)
                 LaunchedEffect(key1 = snackbarHostState) {
                     snackbarHostState.showSnackbar(message = message)
                 }
@@ -145,13 +145,13 @@ fun ImageSegmenter(
                         Text(text = viewModel.colorSpace)
                     }
 
-                    if (!viewModel.backgroundRemoved) {
+                    if (!viewModel.imageUpscaled) {
                         Row(
                             modifier = Modifier.fillMaxSize(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             Button(onClick = {
-                                viewModel.removeBackground()
+                                viewModel.enhanceResolution()
                             }) {
                                 Text(text = stringResource(id = R.string.remove_background))
                             }
@@ -188,7 +188,7 @@ fun ImageSegmenter(
 
 @Composable
 fun ChooseImageButton(
-    viewModel: ImageSegmenterViewModel,
+    viewModel: SisrViewModel,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
