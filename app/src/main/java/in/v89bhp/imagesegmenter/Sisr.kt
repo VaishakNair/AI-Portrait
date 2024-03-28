@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -59,33 +60,7 @@ fun Sisr(
         viewModel.loadModelMetadata(context)
     }
 
-    BottomSheetScaffold(
-
-        scaffoldState = scaffoldState,
-//        sheetPeekHeight = 128.dp,
-        sheetContent = {
-//            Box(
-//                Modifier
-//                    .fillMaxWidth()
-//                    .height(128.dp),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Text("Swipe up to expand sheet")
-//            }
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(64.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(R.string.model_metadata),
-                    style = MaterialTheme.typography.headlineLarge
-                )
-                Text(viewModel.modelMetadata)
-            }
-        },
+    Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -115,7 +90,11 @@ fun Sisr(
         } else {
 
             if (viewModel.imageDimensionError) {
-                val message = stringResource(id = R.string.image_dimension_error, SisrHelper.IMAGE_HEIGHT, SisrHelper.IMAGE_WIDTH)
+                val message = stringResource(
+                    id = R.string.image_dimension_error,
+                    SisrHelper.IMAGE_HEIGHT,
+                    SisrHelper.IMAGE_WIDTH
+                )
                 LaunchedEffect(key1 = snackbarHostState) {
                     snackbarHostState.showSnackbar(message = message)
                 }
