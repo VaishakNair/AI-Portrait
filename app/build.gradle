@@ -107,6 +107,8 @@ dependencies {
     // TF Lite model metadata extractor:
     implementation "org.tensorflow:tensorflow-lite-metadata:0.4.4"
 
+    // Compose navigation
+    implementation "androidx.navigation:navigation-compose:2.6.0"
 
 
 
