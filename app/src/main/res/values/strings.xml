@@ -1,6 +1,6 @@
 <!DOCTYPE resources [<!ENTITY grant_permission "Grant permission">]>
 <resources>
-    <string name="app_name">Portrait Background Remover</string>
+    <string name="app_name">Portrait AI</string>
 
     <string name="alt_bottom_sheet_chevron">Bottom sheet expandable indicator</string>
 
@@ -52,7 +52,7 @@
     <string name="model_metadata">Model Metadata</string>
     <string name="image_dimension_error" formatted="false">Image should have a minimum height of %s and a minimum width of %s.</string>
     <string name="sisr">Single Image Super Resolution</string>
-    <string name="about">About</string>
+    <string name="upscale">Upscale</string>
 
 
 </resources>

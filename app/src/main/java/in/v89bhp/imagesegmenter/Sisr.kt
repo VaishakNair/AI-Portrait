@@ -154,7 +154,7 @@ fun Sisr(
                             Button(onClick = {
                                 viewModel.enhanceResolution()
                             }) {
-                                Text(text = stringResource(id = R.string.remove_background))
+                                Text(text = stringResource(id = R.string.upscale))
                             }
                             ChooseImageButton(viewModel = viewModel)
                         }
