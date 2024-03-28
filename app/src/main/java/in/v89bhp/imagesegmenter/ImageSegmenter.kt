@@ -93,7 +93,7 @@ fun ImageSegmenter(
 
             TopAppBar(
                 title = {
-                    Text(text = stringResource(R.string.background_remover))
+                    Text(text = stringResource(R.string.remove_background))
                 },
                 actions = {
 

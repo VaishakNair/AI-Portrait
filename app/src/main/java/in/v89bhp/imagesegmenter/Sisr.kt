@@ -93,7 +93,7 @@ fun Sisr(
 
             TopAppBar(
                 title = {
-                    Text(text = stringResource(R.string.upscaler))
+                    Text(text = stringResource(R.string.upscale))
                 },
                 actions = {
 
