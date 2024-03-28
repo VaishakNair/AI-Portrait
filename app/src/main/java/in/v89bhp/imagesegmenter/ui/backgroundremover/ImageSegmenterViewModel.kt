@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter
+package `in`.v89bhp.imagesegmenter.ui.backgroundremover
 
 import android.content.ContentValues
 import android.content.Context
@@ -19,7 +19,9 @@ import androidx.core.graphics.set
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import `in`.v89bhp.imagesegmenter.extensions.smoothenTransparentEdges
-import `in`.v89bhp.imagesegmenter.helpers.SisrHelper
+import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper
+import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper.Companion.IMAGE_HEIGHT
+import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper.Companion.IMAGE_WIDTH
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -31,10 +33,12 @@ import org.tensorflow.lite.support.image.ops.ResizeOp
 import java.io.FileOutputStream
 
 
-class SisrViewModel(
+class ImageSegmenterViewModel(
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Main,
     private val start: CoroutineStart = CoroutineStart.DEFAULT,
-    private val sisrHelper: SisrHelper = SisrHelper(coroutineDispatcher = Dispatchers.IO)
+    private val imageSegmentationHelper: ImageSegmentationHelper = ImageSegmentationHelper(
+        coroutineDispatcher = Dispatchers.IO
+    )
 ) : ViewModel() {
 
     var imageBitmap: ImageBitmap? by mutableStateOf(null)
@@ -45,7 +49,7 @@ class SisrViewModel(
 
     var imageLoaded by mutableStateOf(false)
 
-    var imageUpscaled by mutableStateOf(false)
+    var backgroundRemoved by mutableStateOf(false)
 
     var imageSaved by mutableStateOf(false)
 
@@ -71,7 +75,8 @@ class SisrViewModel(
     }
 
     fun loadImage(context: Context, imageUri: Uri) {
-        imageUpscaled = false
+
+        backgroundRemoved = false
         imageSaved = false
         imageDimensionError = false
         imageLoaded = false
@@ -90,7 +95,7 @@ class SisrViewModel(
 
         loadingImage = false
 
-        if (imageBitmap!!.width < SisrHelper.IMAGE_WIDTH || imageBitmap!!.height < SisrHelper.IMAGE_HEIGHT) {
+        if (imageBitmap!!.width < IMAGE_WIDTH || imageBitmap!!.height < IMAGE_HEIGHT) {
             // Show error snackbar:
             imageDimensionError = true
             return
@@ -137,26 +142,97 @@ class SisrViewModel(
         }
     }
 
-    fun enhanceResolution() {
+    fun removeBackground() {
+        // Run in a IO dispatcher as a coroutine:
         viewModelScope.launch(
             context = coroutineDispatcher, start = start
         ) {
             isProcessing = true
+            val segmentationResult =
+                imageSegmentationHelper.segment(imageBitmap!!.asAndroidBitmap(), 0)
+            Log.i(TAG, "Segmented region count: ${segmentationResult.results?.size ?: 0}")
 
-            val enhancedImageBitmap = sisrHelper.enhanceResolution(imageBitmap!!.asAndroidBitmap())
-            imageBitmap = enhancedImageBitmap
-            imageSize = "${imageBitmap!!.width} x ${imageBitmap!!.height}"
-            isProcessing = false
-            imageUpscaled = true
+            if (!segmentationResult.results.isNullOrEmpty()) {
+                val segmentation = segmentationResult.results[0]
+
+                val confidenceMaskTensor =
+                    segmentation.masks[0] // A single confidence mask with each pixel value corresponding
+                // to the probability of the pixel being background (close to 0.0) or foreground (close to 1.0)
+                Log.i(
+                    TAG,
+                    "Confidence mask tensor width x height: ${confidenceMaskTensor.width} x ${confidenceMaskTensor.height}"
+                )
+                val categoryMaskArray = confidenceMaskTensor.tensorBuffer.floatArray
+                Log.i(TAG, "Confidence mask array size: ${categoryMaskArray.size}")
+
+                val pixels = IntArray(categoryMaskArray.size)
+
+                for (i in categoryMaskArray.indices) {
+                    pixels[i] =
+                        if (categoryMaskArray[i] < 0.6) Color.TRANSPARENT else Color.RED  // TODO Modify the threshold as needed.
+                }
+
+                val imageMask = Bitmap.createBitmap(
+                    pixels,
+                    confidenceMaskTensor.width,
+                    confidenceMaskTensor.height,
+                    Bitmap.Config.ARGB_8888
+                )
+
+
+                // PreviewView is in FILL_START mode. So we need to scale up the bounding
+                // box to match with the size that the captured images will be displayed.
+//                val scaleFactor = max(width * 1f / segmentationResult.imageWidth, height * 1f / segmentationResult.imageHeight)
+                val scaleWidth = (segmentationResult.imageWidth * 1f).toInt()
+                val scaleHeight = (segmentationResult.imageHeight * 1f).toInt()
+
+                val scaledImageMask =
+                    Bitmap.createScaledBitmap(imageMask, scaleWidth, scaleHeight, true)
+
+                imageBitmap = applyMask(scaledImageMask)
+
+                isProcessing = false
+                backgroundRemoved = true
+            }
         }
+
+    }
+
+    private suspend fun applyMask(scaledImageMask: Bitmap) = withContext(Dispatchers.IO) {
+        var outputBitmap =
+            imageBitmap!!.asAndroidBitmap().let {// Make a mutable copy of the input bitmap.
+                it.copy(it.config, true)
+            }
+
+        for (i in 0 until scaledImageMask.width) {
+            for (j in 0 until scaledImageMask.height) {
+                val maskValue = scaledImageMask[i, j]
+                if (maskValue == Color.TRANSPARENT) {
+                    outputBitmap[i, j] = maskValue
+                }
+            }
+        }
+        outputBitmap = outputBitmap.smoothenTransparentEdges()
+        outputBitmap.asImageBitmap()
+    }
+
+    fun initializeImageSegmentationHelper(context: Context) {
+        imageSegmentationHelper.setupImageSegmenter(context, onError)
     }
 
 
-    fun initializeSisrHelper(context: Context) {
-        sisrHelper.setup(context)
+    fun rotateImage() {
+        val imageProcessor = ImageProcessor.Builder()
+//                .add(Rot90Op(1))
+            .add(ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
+
+            .build()
+
+        imageBitmap =
+            imageProcessor.process(TensorImage.fromBitmap(imageBitmap!!.asAndroidBitmap())).bitmap.asImageBitmap()
     }
 
     companion object {
-        private const val TAG = "SisrViewModel"
+        private const val TAG = "ImageSegmenterViewModel"
     }
 }

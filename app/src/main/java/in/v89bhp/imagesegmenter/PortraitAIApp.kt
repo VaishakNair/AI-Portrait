@@ -7,8 +7,10 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import `in`.v89bhp.imagesegmenter.ui.backgroundremover.ImageSegmenter
 import `in`.v89bhp.imagesegmenter.ui.home.Home
 import `in`.v89bhp.imagesegmenter.ui.home.NavigationDestination
+import `in`.v89bhp.imagesegmenter.ui.upscaler.Sisr
 
 @Composable
 fun PortraitAIApp(
