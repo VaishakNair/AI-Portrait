@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ImageSegmenter(
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ImageSegmenterViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {

@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun Sisr(
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SisrViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
