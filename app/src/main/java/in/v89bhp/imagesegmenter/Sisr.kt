@@ -119,15 +119,15 @@ fun Sisr(
                         Text(text = viewModel.imageSize)
                     }
 
-                    Row {
-                        Text(text = stringResource(R.string.configuration))
-                        Text(text = viewModel.imageConfiguration)
-                    }
-
-                    Row {
-                        Text(text = stringResource(R.string.color_space))
-                        Text(text = viewModel.colorSpace)
-                    }
+//                    Row {
+//                        Text(text = stringResource(R.string.configuration))
+//                        Text(text = viewModel.imageConfiguration)
+//                    }
+//
+//                    Row {
+//                        Text(text = stringResource(R.string.color_space))
+//                        Text(text = viewModel.colorSpace)
+//                    }
 
                     if (!viewModel.imageUpscaled) {
                         Row(

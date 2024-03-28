@@ -145,6 +145,7 @@ class SisrViewModel(
 
             val enhancedImageBitmap = sisrHelper.enhanceResolution(imageBitmap!!.asAndroidBitmap())
             imageBitmap = enhancedImageBitmap
+            imageSize = "${imageBitmap!!.width} x ${imageBitmap!!.height}"
             isProcessing = false
             imageUpscaled = true
         }
