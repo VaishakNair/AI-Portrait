@@ -53,6 +53,8 @@
     <string name="image_dimension_error" formatted="false">Image should have a minimum height of %s and a minimum width of %s.</string>
     <string name="sisr">Single Image Super Resolution</string>
     <string name="upscale">Upscale</string>
+    <string name="background_remover">Background Remover</string>
+    <string name="upscaler">Upscaler</string>
 
 
 </resources>
