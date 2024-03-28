@@ -7,7 +7,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import `in`.v89bhp.imagesegmenter.ui.about.About
 import `in`.v89bhp.imagesegmenter.ui.home.Home
 import `in`.v89bhp.imagesegmenter.ui.home.NavigationDestination
 
@@ -42,12 +41,6 @@ fun PortraitAIApp(
             )
         }
 
-
-        composable(NavigationDestination.ABOUT.route) { backStackEntry ->
-            About(navigateBack = {
-                appState.navigateBack()
-            })
-        }
 
 
 

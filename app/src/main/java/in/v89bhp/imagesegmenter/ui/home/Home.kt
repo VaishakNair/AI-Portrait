@@ -65,7 +65,6 @@ fun Home(
 enum class NavigationDestination(@DrawableRes val icon: Int, val label: String, val route: String) {
     BACKGROUND_REMOVER(R.drawable.ic_background_remover, "Background Remover", "backgroundremover"),
     UPSCALER(R.drawable.ic_upscaler, "Upscaler", "upscaler"),
-    ABOUT(R.drawable.ic_info_outline, "About", "about")
 }
 
 
