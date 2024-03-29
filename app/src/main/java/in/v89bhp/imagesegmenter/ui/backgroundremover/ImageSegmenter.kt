@@ -23,15 +23,14 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import `in`.v89bhp.imagesegmenter.R
 import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper
@@ -136,13 +135,24 @@ fun ImageSegmenter(
                         }
                     } else {
                         Column(modifier = Modifier.fillMaxSize()) {
-                            Row() {
-                                Slider(value = viewModel.threshold,
-                                    valueRange = 0.5f..1.0f,
+                            Row(
+                                modifier = Modifier.padding(8.dp)
+                                    .fillMaxSize(),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Slider(
+                                    modifier = Modifier.weight(0.4f),
+                                    value = viewModel.threshold,
+                                    valueRange = 0.0f..1.0f,
+                                    steps = 4,
                                     onValueChange = { viewModel.threshold = it })
-
+                                Text(
+                                    modifier = Modifier.weight(0.2f),
+                                    text = String.format("%.1f", viewModel.threshold))
                                 Button(
-                                    onClick = { viewModel.alterThreshold() },
+                                    modifier = Modifier.weight(0.4f),
+                                    onClick = { viewModel.reApplyMask() },
                                 ) {
                                     Text(text = stringResource(id = R.string.recalculate))
                                 }
