@@ -163,34 +163,9 @@ class ImageSegmenterViewModel(
                     TAG,
                     "Confidence mask tensor width x height: ${confidenceMaskTensor.width} x ${confidenceMaskTensor.height}"
                 )
-                val categoryMaskArray = confidenceMaskTensor.tensorBuffer.floatArray
-                Log.i(TAG, "Confidence mask array size: ${categoryMaskArray.size}")
-
-                val pixels = IntArray(categoryMaskArray.size)
-
-                for (i in categoryMaskArray.indices) {
-                    pixels[i] =
-                        if (categoryMaskArray[i] < 0.6) Color.TRANSPARENT else Color.RED  // TODO Modify the threshold as needed.
-                }
-
-                val imageMask = Bitmap.createBitmap(
-                    pixels,
-                    confidenceMaskTensor.width,
-                    confidenceMaskTensor.height,
-                    Bitmap.Config.ARGB_8888
-                )
 
 
-                // PreviewView is in FILL_START mode. So we need to scale up the bounding
-                // box to match with the size that the captured images will be displayed.
-//                val scaleFactor = max(width * 1f / segmentationResult.imageWidth, height * 1f / segmentationResult.imageHeight)
-                val scaleWidth = (segmentationResult.imageWidth * 1f).toInt()
-                val scaleHeight = (segmentationResult.imageHeight * 1f).toInt()
-
-                val scaledImageMask =
-                    Bitmap.createScaledBitmap(imageMask, scaleWidth, scaleHeight, true)
-
-                imageBitmap = applyMask(scaledImageMask)
+                imageBitmap = applyMask(confidenceMaskTensor)
 
                 isProcessing = false
                 backgroundRemoved = true
@@ -203,7 +178,27 @@ class ImageSegmenterViewModel(
 
     }
 
-    private suspend fun applyMask(scaledImageMask: Bitmap) = withContext(Dispatchers.IO) {
+    private suspend fun applyMask(confidenceMaskTensor: TensorImage) = withContext(Dispatchers.IO) {
+        val categoryMaskArray = confidenceMaskTensor.tensorBuffer.floatArray
+        Log.i(TAG, "Confidence mask array size: ${categoryMaskArray.size}")
+
+        val pixels = IntArray(categoryMaskArray.size)
+
+        for (i in categoryMaskArray.indices) {
+            pixels[i] =
+                if (categoryMaskArray[i] < 0.6) Color.TRANSPARENT else Color.RED  // TODO Modify the threshold as needed.
+        }
+
+        val imageMask = Bitmap.createBitmap(
+            pixels,
+            confidenceMaskTensor.width,
+            confidenceMaskTensor.height,
+            Bitmap.Config.ARGB_8888
+        )
+
+        val scaledImageMask =
+            Bitmap.createScaledBitmap(imageMask, imageBitmap!!.width, imageBitmap!!.height, true)
+
         var outputBitmap =
             imageBitmap!!.asAndroidBitmap().let {// Make a mutable copy of the input bitmap.
                 it.copy(it.config, true)
