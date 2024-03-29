@@ -144,8 +144,8 @@ fun ImageSegmenter(
                                 Slider(
                                     modifier = Modifier.weight(0.4f),
                                     value = viewModel.threshold,
-                                    valueRange = 0.0f..1.0f,
-                                    steps = 4,
+                                    valueRange = 0.0f..0.9f,
+                                    steps = 8,
                                     onValueChange = { viewModel.threshold = it })
                                 Text(
                                     modifier = Modifier.weight(0.2f),

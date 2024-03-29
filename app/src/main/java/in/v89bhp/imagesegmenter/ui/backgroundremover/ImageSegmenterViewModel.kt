@@ -43,6 +43,8 @@ class ImageSegmenterViewModel(
 
     var imageBitmap: ImageBitmap? by mutableStateOf(null)
 
+    private lateinit var loadedImage: Bitmap
+
     var loadingImage by mutableStateOf(false)
 
     var isProcessing by mutableStateOf(false)
@@ -66,6 +68,8 @@ class ImageSegmenterViewModel(
 
     var threshold by mutableStateOf(0.5f)
 
+    private lateinit var confidenceMaskTensorImage: TensorImage
+
 
     private val onError: (errorMessage: String) -> Unit = { errorMessage ->
         TODO("Not yet implemented")
@@ -87,7 +91,10 @@ class ImageSegmenterViewModel(
         val source: ImageDecoder.Source =
             ImageDecoder.createSource(context.contentResolver, imageUri)
         imageBitmap =
-            ImageDecoder.decodeBitmap(source).let { bitmap -> // Convert to ARGB_8888 format:
+            ImageDecoder.decodeBitmap(source).let { bitmap ->
+                // Convert to ARGB_8888 format and make a copy:
+                loadedImage = bitmap.copy(Bitmap.Config.ARGB_8888, false)
+                // Convert to ARGB_8888 format:
                 bitmap.copy(Bitmap.Config.ARGB_8888, false)
             }.asImageBitmap().also {
                 imageConfiguration = it.config.toString()
@@ -156,16 +163,16 @@ class ImageSegmenterViewModel(
             if (!segmentationResult.results.isNullOrEmpty()) {
                 val segmentation = segmentationResult.results[0]
 
-                val confidenceMaskTensor =
+                confidenceMaskTensorImage =
                     segmentation.masks[0] // A single confidence mask with each pixel value corresponding
                 // to the probability of the pixel being background (close to 0.0) or foreground (close to 1.0)
                 Log.i(
                     TAG,
-                    "Confidence mask tensor width x height: ${confidenceMaskTensor.width} x ${confidenceMaskTensor.height}"
+                    "Confidence mask tensor width x height: ${confidenceMaskTensorImage.width} x ${confidenceMaskTensorImage.height}"
                 )
 
 
-                imageBitmap = applyMask(confidenceMaskTensor)
+                imageBitmap = applyMask()
 
                 isProcessing = false
                 backgroundRemoved = true
@@ -174,25 +181,31 @@ class ImageSegmenterViewModel(
 
     }
 
-    fun alterThreshold() {
+    fun reApplyMask() {
+        viewModelScope.launch(context = coroutineDispatcher, start = start) {
+            isProcessing = true
 
+            imageBitmap = applyMask()
+
+            isProcessing = false
+        }
     }
 
-    private suspend fun applyMask(confidenceMaskTensor: TensorImage) = withContext(Dispatchers.IO) {
-        val categoryMaskArray = confidenceMaskTensor.tensorBuffer.floatArray
+    private suspend fun applyMask() = withContext(Dispatchers.IO) {
+        val categoryMaskArray = confidenceMaskTensorImage.tensorBuffer.floatArray
         Log.i(TAG, "Confidence mask array size: ${categoryMaskArray.size}")
 
         val pixels = IntArray(categoryMaskArray.size)
 
         for (i in categoryMaskArray.indices) {
             pixels[i] =
-                if (categoryMaskArray[i] < 0.6) Color.TRANSPARENT else Color.RED  // TODO Modify the threshold as needed.
+                if (categoryMaskArray[i] > threshold) Color.RED else Color.TRANSPARENT
         }
 
         val imageMask = Bitmap.createBitmap(
             pixels,
-            confidenceMaskTensor.width,
-            confidenceMaskTensor.height,
+            confidenceMaskTensorImage.width,
+            confidenceMaskTensorImage.height,
             Bitmap.Config.ARGB_8888
         )
 
@@ -200,7 +213,7 @@ class ImageSegmenterViewModel(
             Bitmap.createScaledBitmap(imageMask, imageBitmap!!.width, imageBitmap!!.height, true)
 
         var outputBitmap =
-            imageBitmap!!.asAndroidBitmap().let {// Make a mutable copy of the input bitmap.
+            loadedImage.let {// Make a mutable copy of the input bitmap.
                 it.copy(it.config, true)
             }
 
