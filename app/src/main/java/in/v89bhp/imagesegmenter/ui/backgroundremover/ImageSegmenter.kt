@@ -18,6 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -82,7 +83,11 @@ fun ImageSegmenter(
         } else {
 
             if (viewModel.imageDimensionError) {
-                val message = stringResource(id = R.string.image_dimension_error, ImageSegmentationHelper.IMAGE_HEIGHT, ImageSegmentationHelper.IMAGE_WIDTH)
+                val message = stringResource(
+                    id = R.string.image_dimension_error,
+                    ImageSegmentationHelper.IMAGE_HEIGHT,
+                    ImageSegmentationHelper.IMAGE_WIDTH
+                )
                 LaunchedEffect(key1 = snackbarHostState) {
                     snackbarHostState.showSnackbar(message = message)
                 }
@@ -130,17 +135,30 @@ fun ImageSegmenter(
                             ChooseImageButton(viewModel = viewModel)
                         }
                     } else {
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Row() {
+                                Slider(value = viewModel.threshold,
+                                    valueRange = 0.5f..1.0f,
+                                    onValueChange = { viewModel.threshold = it })
 
-                            ChooseImageButton(viewModel = viewModel)
-                            Button(
-                                onClick = { viewModel.saveImage(context) },
-                                enabled = viewModel.imageSaved.not()
+                                Button(
+                                    onClick = { viewModel.alterThreshold() },
+                                ) {
+                                    Text(text = stringResource(id = R.string.recalculate))
+                                }
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                Text(text = stringResource(id = R.string.save))
+
+                                ChooseImageButton(viewModel = viewModel)
+                                Button(
+                                    onClick = { viewModel.saveImage(context) },
+                                    enabled = viewModel.imageSaved.not()
+                                ) {
+                                    Text(text = stringResource(id = R.string.save))
+                                }
                             }
                         }
                         if (viewModel.imageSaved) {

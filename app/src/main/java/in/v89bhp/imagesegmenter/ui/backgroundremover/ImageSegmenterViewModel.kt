@@ -64,6 +64,8 @@ class ImageSegmenterViewModel(
 
     var modelMetadata by mutableStateOf("")
 
+    var threshold by mutableStateOf(0.5f)
+
 
     private val onError: (errorMessage: String) -> Unit = { errorMessage ->
         TODO("Not yet implemented")
@@ -143,7 +145,6 @@ class ImageSegmenterViewModel(
     }
 
     fun removeBackground() {
-        // Run in a IO dispatcher as a coroutine:
         viewModelScope.launch(
             context = coroutineDispatcher, start = start
         ) {
@@ -195,6 +196,10 @@ class ImageSegmenterViewModel(
                 backgroundRemoved = true
             }
         }
+
+    }
+
+    fun alterThreshold() {
 
     }
 
