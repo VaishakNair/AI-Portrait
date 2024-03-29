@@ -135,21 +135,33 @@ fun ImageSegmenter(
                         }
                     } else {
                         Column(modifier = Modifier.fillMaxSize()) {
+
                             Row(
-                                modifier = Modifier.padding(8.dp)
+                                modifier = Modifier
+                                    .padding(8.dp)
                                     .fillMaxSize(),
                                 horizontalArrangement = Arrangement.SpaceEvenly,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Slider(
-                                    modifier = Modifier.weight(0.4f),
-                                    value = viewModel.threshold,
-                                    valueRange = 0.0f..0.9f,
-                                    steps = 8,
-                                    onValueChange = { viewModel.threshold = it })
-                                Text(
-                                    modifier = Modifier.weight(0.2f),
-                                    text = String.format("%.1f", viewModel.threshold))
+                                Column(
+                                    modifier = Modifier.weight(0.6f),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(text = stringResource(id = R.string.threshold))
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Slider(
+                                            modifier = Modifier.weight(0.8f),
+                                            value = viewModel.threshold,
+                                            valueRange = 0.0f..0.9f,
+                                            steps = 8,
+                                            onValueChange = { viewModel.threshold = it })
+                                        Text(
+                                            modifier = Modifier.weight(0.2f),
+                                            text = String.format("%.1f", viewModel.threshold)
+                                        )
+                                    }
+                                }
+
                                 Button(
                                     modifier = Modifier.weight(0.4f),
                                     onClick = { viewModel.reApplyMask() },

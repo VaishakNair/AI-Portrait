@@ -54,5 +54,6 @@
     <string name="sisr">Single Image Super Resolution</string>
     <string name="upscale">Upscale</string>
     <string name="recalculate">Recalculate</string>
+    <string name="threshold">Threshold</string>
 
 </resources>
