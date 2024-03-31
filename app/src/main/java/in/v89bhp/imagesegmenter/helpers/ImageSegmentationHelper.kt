@@ -54,10 +54,13 @@ class ImageSegmentationHelper(
 
 
     fun clearImageSegmenter() {
+        imageSegmenter?.close()
         imageSegmenter = null
     }
 
     fun setupImageSegmenter(context: Context, onError: (String) -> Unit) {
+        this.context = context
+        this.onError = onError
         // Create the base options for the segment
         val optionsBuilder =
             ImageSegmenter.ImageSegmenterOptions.builder()
@@ -136,6 +139,8 @@ class ImageSegmentationHelper(
 
             val segmentResult = imageSegmenter?.segment(tensorImage)
             inferenceTime = SystemClock.uptimeMillis() - inferenceTime
+
+            clearImageSegmenter()
 
             SegmentationResult(
                 segmentResult,
