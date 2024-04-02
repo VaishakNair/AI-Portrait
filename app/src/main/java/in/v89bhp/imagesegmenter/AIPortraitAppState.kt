@@ -23,14 +23,14 @@ sealed class Screen(val route: String) {
 
 
 @Composable
-fun rememberPortraitAIAppState(
+fun rememberAIPortraitAppState(
     navController: NavHostController = rememberNavController(),
     context: Context = LocalContext.current
 ) = remember(navController, context) {
-    PortraitAIAppState(navController, context)
+    AIPortraitAppState(navController, context)
 }
 
-class PortraitAIAppState(
+class AIPortraitAppState(
     val navController: NavHostController,
     private val context: Context
 ) {

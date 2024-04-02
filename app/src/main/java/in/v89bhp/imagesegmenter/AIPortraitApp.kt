@@ -13,10 +13,10 @@ import `in`.v89bhp.imagesegmenter.ui.home.NavigationDestination
 import `in`.v89bhp.imagesegmenter.ui.upscaler.Sisr
 
 @Composable
-fun PortraitAIApp(
+fun AIPortraitApp(
     modifier: Modifier = Modifier,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    appState: PortraitAIAppState = rememberPortraitAIAppState()
+    appState: AIPortraitAppState = rememberAIPortraitAppState()
 ) {
     NavHost(
         navController = appState.navController,

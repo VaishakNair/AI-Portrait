@@ -22,7 +22,7 @@ class MainActivity : FragmentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    PortraitAIApp()
+                    AIPortraitApp()
                 }
             }
         }

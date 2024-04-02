@@ -1,6 +1,6 @@
 <!DOCTYPE resources [<!ENTITY grant_permission "Grant permission">]>
 <resources>
-    <string name="app_name">Portrait AI</string>
+    <string name="app_name">AI Portrait</string>
 
     <string name="alt_bottom_sheet_chevron">Bottom sheet expandable indicator</string>
 
