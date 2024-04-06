@@ -185,6 +185,8 @@ class ImageSegmenterViewModel(
         viewModelScope.launch(context = coroutineDispatcher, start = start) {
             isProcessing = true
 
+            imageSaved = false
+
             imageBitmap = applyMask()
 
             isProcessing = false
