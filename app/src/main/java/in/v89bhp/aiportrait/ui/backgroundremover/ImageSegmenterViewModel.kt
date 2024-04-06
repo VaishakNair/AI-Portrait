@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter.ui.backgroundremover
+package `in`.v89bhp.aiportrait.ui.backgroundremover
 
 import android.content.ContentValues
 import android.content.Context
@@ -18,10 +18,10 @@ import androidx.core.graphics.get
 import androidx.core.graphics.set
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import `in`.v89bhp.imagesegmenter.extensions.smoothenTransparentEdges
-import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper
-import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper.Companion.IMAGE_HEIGHT
-import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper.Companion.IMAGE_WIDTH
+import `in`.v89bhp.aiportrait.extensions.smoothenTransparentEdges
+import `in`.v89bhp.aiportrait.helpers.ImageSegmentationHelper
+import `in`.v89bhp.aiportrait.helpers.ImageSegmentationHelper.Companion.IMAGE_HEIGHT
+import `in`.v89bhp.aiportrait.helpers.ImageSegmentationHelper.Companion.IMAGE_WIDTH
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers

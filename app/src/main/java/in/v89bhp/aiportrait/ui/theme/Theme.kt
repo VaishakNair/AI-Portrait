@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter.ui.theme
+package `in`.v89bhp.aiportrait.ui.theme
 
 import android.app.Activity
 import android.os.Build

@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter
+package `in`.v89bhp.aiportrait
 
 import android.content.Context
 import androidx.compose.runtime.Composable

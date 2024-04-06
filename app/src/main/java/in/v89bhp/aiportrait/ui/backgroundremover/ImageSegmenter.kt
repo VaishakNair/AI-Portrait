@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter.ui.backgroundremover
+package `in`.v89bhp.aiportrait.ui.backgroundremover
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -32,9 +32,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import `in`.v89bhp.imagesegmenter.R
-import `in`.v89bhp.imagesegmenter.helpers.ImageSegmentationHelper
-import `in`.v89bhp.imagesegmenter.ui.progressbars.CircularProgress
+import `in`.v89bhp.aiportrait.R
+import `in`.v89bhp.aiportrait.helpers.ImageSegmentationHelper
+import `in`.v89bhp.aiportrait.ui.progressbars.CircularProgress
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable

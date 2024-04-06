@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter.ui.home
+package `in`.v89bhp.aiportrait.ui.home
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

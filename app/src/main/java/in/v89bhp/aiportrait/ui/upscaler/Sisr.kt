@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter.ui.upscaler
+package `in`.v89bhp.aiportrait.ui.upscaler
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -22,19 +22,17 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import `in`.v89bhp.imagesegmenter.R
-import `in`.v89bhp.imagesegmenter.helpers.SisrHelper
-import `in`.v89bhp.imagesegmenter.ui.progressbars.CircularProgress
+import `in`.v89bhp.aiportrait.R
+import `in`.v89bhp.aiportrait.helpers.SisrHelper
+import `in`.v89bhp.aiportrait.ui.progressbars.CircularProgress
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable

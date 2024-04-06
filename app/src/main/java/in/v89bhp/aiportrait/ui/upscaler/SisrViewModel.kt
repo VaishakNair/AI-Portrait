@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter.ui.upscaler
+package `in`.v89bhp.aiportrait.ui.upscaler
 
 import android.content.ContentValues
 import android.content.Context
@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import `in`.v89bhp.imagesegmenter.helpers.SisrHelper
+import `in`.v89bhp.aiportrait.helpers.SisrHelper
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers

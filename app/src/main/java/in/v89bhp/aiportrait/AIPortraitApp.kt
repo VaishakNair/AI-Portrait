@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter
+package `in`.v89bhp.aiportrait
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -7,10 +7,10 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import `in`.v89bhp.imagesegmenter.ui.backgroundremover.ImageSegmenter
-import `in`.v89bhp.imagesegmenter.ui.home.Home
-import `in`.v89bhp.imagesegmenter.ui.home.NavigationDestination
-import `in`.v89bhp.imagesegmenter.ui.upscaler.Sisr
+import `in`.v89bhp.aiportrait.ui.backgroundremover.ImageSegmenter
+import `in`.v89bhp.aiportrait.ui.home.Home
+import `in`.v89bhp.aiportrait.ui.home.NavigationDestination
+import `in`.v89bhp.aiportrait.ui.upscaler.Sisr
 
 @Composable
 fun AIPortraitApp(

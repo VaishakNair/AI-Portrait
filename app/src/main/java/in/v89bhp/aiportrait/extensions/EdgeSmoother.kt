@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter.extensions
+package `in`.v89bhp.aiportrait.extensions
 
 import android.graphics.Bitmap
 import android.graphics.Color

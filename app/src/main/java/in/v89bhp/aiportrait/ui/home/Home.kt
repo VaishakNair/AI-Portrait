@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter.ui.home
+package `in`.v89bhp.aiportrait.ui.home
 
 
 import androidx.activity.ComponentActivity
@@ -19,14 +19,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import `in`.v89bhp.imagesegmenter.R
+import `in`.v89bhp.aiportrait.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

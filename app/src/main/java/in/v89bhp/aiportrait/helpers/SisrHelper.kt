@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter.helpers
+package `in`.v89bhp.aiportrait.helpers
 
 import android.content.Context
 import android.graphics.Bitmap

@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter
+package `in`.v89bhp.aiportrait
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.FragmentActivity
-import `in`.v89bhp.imagesegmenter.ui.theme.ObjectDetectorTheme
+import `in`.v89bhp.aiportrait.ui.theme.ObjectDetectorTheme
 
 class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

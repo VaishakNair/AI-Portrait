@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace 'in.v89bhp.imagesegmenter'
+    namespace 'in.v89bhp.aiportrait'
     compileSdk 33
 
     defaultConfig {
-        applicationId "in.v89bhp.imagesegmenter"
+        applicationId "in.v89bhp.aiportrait"
         minSdk 31
         targetSdk 33
         versionCode 1

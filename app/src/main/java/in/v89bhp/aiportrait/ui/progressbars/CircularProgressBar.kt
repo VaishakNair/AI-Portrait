@@ -1,4 +1,4 @@
-package `in`.v89bhp.imagesegmenter.ui.progressbars
+package `in`.v89bhp.aiportrait.ui.progressbars
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

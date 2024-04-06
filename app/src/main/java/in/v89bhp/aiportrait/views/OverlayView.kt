@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package `in`.v89bhp.imagesegmenter.views
+package `in`.v89bhp.aiportrait.views
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -22,7 +22,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
-import org.tensorflow.lite.task.vision.segmenter.ColoredLabel
 import org.tensorflow.lite.task.vision.segmenter.Segmentation
 import kotlin.math.max
 
