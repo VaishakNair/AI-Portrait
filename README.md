@@ -31,3 +31,6 @@ AI Portrait is an Android app that uses on-device machine learning to remove bac
 
 #### Output
 ![Upscale output](https://i.postimg.cc/0QNqHxSJ/Upscale-Output.png)
+
+##  Android app on Google Play
+[![Download](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=in.v89bhp.aiportrait)
