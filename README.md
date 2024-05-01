@@ -12,6 +12,8 @@ AI Portrait is an Android app that uses on-device machine learning to remove bac
 - Dataset: [P3M-10k](https://paperswithcode.com/dataset/p3m-10k)
 - Implementation: [GitHub](https://github.com/VaishakNair/PortraitBackgroundRemoverU2Net)
 
+#### Input
+![Remove background input](https://i.postimg.cc/wjKgxSCS/Background-Remover-Input.png)
 
 
 ### Upscale
