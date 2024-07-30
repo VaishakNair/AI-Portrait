@@ -18,10 +18,13 @@ import androidx.core.graphics.get
 import androidx.core.graphics.set
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import `in`.v89bhp.aiportrait.extensions.smoothenTransparentEdges
 import `in`.v89bhp.aiportrait.helpers.ImageSegmentationHelper
 import `in`.v89bhp.aiportrait.helpers.ImageSegmentationHelper.Companion.IMAGE_HEIGHT
 import `in`.v89bhp.aiportrait.helpers.ImageSegmentationHelper.Companion.IMAGE_WIDTH
+import `in`.v89bhp.aiportrait.workers.SaveImageWorker
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -114,41 +117,43 @@ class ImageSegmenterViewModel(
     }
 
     fun saveImage(context: Context) {
-        viewModelScope.launch(
-            context = coroutineDispatcher, start = start
-        ) {
-            val resolver = context.applicationContext.contentResolver
-            val photoDetails = ContentValues().apply {
-                put(
-                    MediaStore.Images.Media.DISPLAY_NAME, "${System.currentTimeMillis()}.png"
-                )
-                put(MediaStore.Images.Media.IS_PENDING, 1)
-            }
-            val imagesCollection =
-                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-
-            val photoContentUri = resolver.insert(imagesCollection, photoDetails)
-
-            isProcessing = true
-
-            withContext(Dispatchers.IO) {
-                // Dump the image data to the actual file returned by MediaStore:
-                resolver.openFileDescriptor(photoContentUri!!, "w", null).use { fd ->
-                    FileOutputStream(fd!!.fileDescriptor).use { os ->
-                        imageBitmap!!.asAndroidBitmap().apply { setHasAlpha(true) }.compress(
-                            Bitmap.CompressFormat.PNG, 100, os
-                        )
-                    }
-                }
-
-                // Photo dumped. Clear the IS_PENDING STATUS:
-                photoDetails.clear()
-                photoDetails.put(MediaStore.Images.Media.IS_PENDING, 0)
-                resolver.update(photoContentUri, photoDetails, null, null)
-            }
-            isProcessing = false
-            imageSaved = true
-        }
+        val wm = WorkManager.getInstance(context)
+        wm.enqueue(OneTimeWorkRequest.from(SaveImageWorker::class.java))
+//        viewModelScope.launch(
+//            context = coroutineDispatcher, start = start
+//        ) {
+//            val resolver = context.applicationContext.contentResolver
+//            val photoDetails = ContentValues().apply {
+//                put(
+//                    MediaStore.Images.Media.DISPLAY_NAME, "${System.currentTimeMillis()}.png"
+//                )
+//                put(MediaStore.Images.Media.IS_PENDING, 1)
+//            }
+//            val imagesCollection =
+//                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+//
+//            val photoContentUri = resolver.insert(imagesCollection, photoDetails)
+//
+//            isProcessing = true
+//
+//            withContext(Dispatchers.IO) {
+//                // Dump the image data to the actual file returned by MediaStore:
+//                resolver.openFileDescriptor(photoContentUri!!, "w", null).use { fd ->
+//                    FileOutputStream(fd!!.fileDescriptor).use { os ->
+//                        imageBitmap!!.asAndroidBitmap().apply { setHasAlpha(true) }.compress(
+//                            Bitmap.CompressFormat.PNG, 100, os
+//                        )
+//                    }
+//                }
+//
+//                // Photo dumped. Clear the IS_PENDING STATUS:
+//                photoDetails.clear()
+//                photoDetails.put(MediaStore.Images.Media.IS_PENDING, 0)
+//                resolver.update(photoContentUri, photoDetails, null, null)
+//            }
+//            isProcessing = false
+//            imageSaved = true
+//        }
     }
 
     fun removeBackground() {
